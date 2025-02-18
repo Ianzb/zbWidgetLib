@@ -45,14 +45,14 @@ class BasicPage(BetterScrollArea):
     def setIcon(self, icon):
         """
         设置页面图标
-        @param icon: 图标
+        :param icon: 图标
         """
         self.pageIcon = icon
 
     def icon(self):
         """
         获取页面图标
-        @return: 图标
+        :return: 图标
         """
         return self.pageIcon
 
@@ -80,7 +80,7 @@ class BasicTabPage(BasicPage):
     def addPage(self, widget):
         """
         添加标签页
-        @param widget: 标签页对象，需设置icon属性为页面图标
+        :param widget: 标签页对象，需设置icon属性为页面图标
         """
         name = widget.objectName()
         widget.setAlignment(Qt.AlignCenter)
@@ -124,8 +124,8 @@ class ChangeableTab(BasicTab):
     def addPage(self, widget, name=None, alignment: Qt.AlignmentFlag | None = None):
         """
         添加页面
-        @param widget: 组件
-        @param name: 组件名称（默认为objectName）
+        :param widget: 组件
+        :param name: 组件名称（默认为objectName）
         """
         widget.setParent(self)
         widget.hide()
@@ -140,7 +140,7 @@ class ChangeableTab(BasicTab):
     def showPage(self, name):
         """
         展示页面
-        @param name: 组件名称
+        :param name: 组件名称
         """
         self.hidePage()
         self.page[name].show()
@@ -162,8 +162,8 @@ class ToolBar(QWidget):
 
     def __init__(self, title: str, subtitle: str, parent=None):
         """
-        @param title: 主标题
-        @param subtitle: 副标题
+        :param title: 主标题
+        :param subtitle: 副标题
         """
         super().__init__(parent=parent)
         self.setFixedHeight(90)
