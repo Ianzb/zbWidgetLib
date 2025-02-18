@@ -541,7 +541,6 @@ class CardGroup(QWidget):
             self.titleLabel.setText(title)
 
     def addCard(self, card: QWidget, wid: str | int):
-        card.deleted.connect(self.removeCard)
         self.vBoxLayout.insertWidget(1, card, 0, Qt.AlignmentFlag.AlignTop)
         self.cards.insert(0, card)
         self.cardMap[wid] = card
