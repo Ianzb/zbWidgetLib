@@ -529,7 +529,7 @@ class CardGroup(QWidget):
 
         self.vBoxLayout = QVBoxLayout(self)
         self.vBoxLayout.setSpacing(5)
-        self.vBoxLayout.setContentsMargins(30, 0, 30, 0)
+        self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
         self.vBoxLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.vBoxLayout.addWidget(self.titleLabel)
         self.vBoxLayout.addSpacing(12)
