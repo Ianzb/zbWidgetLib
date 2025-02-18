@@ -1,0 +1,35 @@
+[project]
+name = "zbWidgetLib"
+version = "0.1.0"
+description = "zb组件库"
+requires-python = ">=3.12"
+dependencies = [
+    "zbToolLib>=1.2.0",
+    "PySide6-Fluent-Widgets[full]>=1.7.0",
+    "QtPy>=2.4.3"
+]
+authors = [
+    { name = "Ianzb", email = "93322252@qq.com" },
+]
+maintainers = [
+    { name = "Ianzb", email = "93322252@qq.com" },
+]
+readme = "README.md"
+license = { text = "GPLv3 License" }
+keywords = ["zb", "Ianzb", "widget", "lib"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: GPLv3 License",
+    "Operating System :: OS Independent",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+Repository = "https://github.com/Ianzb/zbWidgetLib/"
