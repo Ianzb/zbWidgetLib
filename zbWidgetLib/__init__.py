@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 from .base import *
 from .page import *
 
@@ -37,45 +39,54 @@ class Image(QLabel):
     downloadFinishedSignal = Signal(bool)
 
     @functools.singledispatchmethod
-    def __init__(self, parent=None, fixed_size=True):
+    def __init__(self, parent=None):
         super().__init__(parent=parent)
-        if fixed_size:
-            self.setFixedSize(48, 48)
+        self.setFixedSize(48, 48)
         self.setScaledContents(True)
         self.loading = False
+        self.downloadFinishedSignal.connect(self.downloadFinished)
 
     @__init__.register
-    def _(self, path: str, url: str = None, parent=None, fixed_size=True, threadPool=None):
+    def _(self, path: str, url: str = None, parent=None, thread_pool: ThreadPoolExecutor = None):
         """
         :param path: 路径
         :param url: 链接
         """
-        self.__init__(parent, fixed_size)
+        self.__init__(parent)
         if path:
-            self.setImg(path, url, threadPool)
+            self.setImg(path, url, thread_pool)
 
-    def setImg(self, path: str, url: str = None, threadPool=None):
+    @__init__.register
+    def _(self, path: str, parent=None):
+        """
+        :param path: 路径
+        """
+        self.__init__(parent)
+        if path:
+            self.setImg(path)
+
+    def setImg(self, path: str, url: str = None, thread_pool: ThreadPoolExecutor = None):
         """
         设置图片
         :param path: 路径
         :param url: 链接
-        :param threadPool: 下载线程池
+        :param thread_pool: 下载线程池
         """
         if url:
             self.loading = True
             self.path = path
             self.url = url
 
-            self.downloadFinishedSignal.connect(self.downloadFinished)
-            threadPool.submit(self.download)
+            thread_pool.submit(self.download)
         else:
             self.loading = False
             self.setPixmap(QPixmap(path))
 
     def downloadFinished(self, msg):
+        if not self.loading:
+            return
         if msg or f.existPath(self.path):
-            self.loading = False
-            self.setPixmap(QPixmap(self.path))
+            self.setImg(self.path)
 
     def download(self):
         if f.existPath(self.path):
@@ -374,15 +385,14 @@ class BigInfoCard(CardWidget):
         """
         self.titleLabel.setText(text)
 
-    def setImg(self, path: str, url: str = None, thread_pool: QThreadPool = None):
+    def setImg(self, path: str, url: str = None, thread_pool: ThreadPoolExecutor = None):
         """
         设置图片
         :param path: 路径
         :param url: 链接
         :param thread_pool: 线程池
         """
-        self.image.threadPool = thread_pool
-        self.image.setImg(path, url)
+        self.image.setImg(path, url, thread_pool)
 
     def setInfo(self, data: str):
         """
@@ -494,13 +504,14 @@ class SmallInfoCard(CardWidget):
         """
         self.titleLabel.setText(text)
 
-    def setImg(self, path: str, url: str = None, threadPool=None):
+    def setImg(self, path: str, url: str = None, thread_pool: ThreadPoolExecutor = None):
         """
         设置图片
         :param path: 路径
         :param url: 链接
+        :param thread_pool: 线程池
         """
-        self.image.setImg(path, url, threadPool)
+        self.image.setImg(path, url, thread_pool)
 
     def setInfo(self, data: str, pos: int):
         """
