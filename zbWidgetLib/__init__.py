@@ -139,7 +139,6 @@ class DisplayCard(ElevatedCardWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFixedSize(168, 176)
-        self.setStyleSheet("QLabel {background-color: rgba(0,0,0,0); border: none;}")
 
         self.widget = Image(self)
 
@@ -151,15 +150,6 @@ class DisplayCard(ElevatedCardWidget):
         self.vBoxLayout.addWidget(self.widget, 0, Qt.AlignCenter)
         self.vBoxLayout.addStretch(1)
         self.vBoxLayout.addWidget(self.bodyLabel, 0, Qt.AlignHCenter | Qt.AlignBottom)
-
-        self.setTheme()
-        qconfig.themeChanged.connect(self.setTheme)
-
-    def setTheme(self):
-        if isDarkTheme():
-            self.setStyleSheet("QLabel {background-color: transparent; color: white}")
-        else:
-            self.setStyleSheet("QLabel {background-color: transparent; color: black}")
 
     def setText(self, text: str):
         """
@@ -261,10 +251,8 @@ class GrayCard(QWidget):
 
     def setTheme(self):
         if isDarkTheme():
-            self.setStyleSheet("QLabel {background-color: transparent; color: white}")
             self.card.setStyleSheet("#GrayCard {background-color: rgba(25,25,25,0.5); border:1px solid rgba(20,20,20,0.15); border-radius: 10px}")
         else:
-            self.setStyleSheet("QLabel {background-color: transparent; color: black}")
             self.card.setStyleSheet("#GrayCard {background-color: rgba(175,175,175,0.1); border:1px solid rgba(150,150,150,0.15); border-radius: 10px}")
 
     def addWidget(self, widget, spacing=0, alignment=Qt.AlignTop):
@@ -365,15 +353,6 @@ class BigInfoCard(CardWidget):
         self.hBoxLayout.setContentsMargins(34, 24, 24, 24)
         self.hBoxLayout.addWidget(self.image, 0, Qt.AlignVCenter)
         self.hBoxLayout.addLayout(self.vBoxLayout)
-
-        self.setTheme()
-        qconfig.themeChanged.connect(self.setTheme)
-
-    def setTheme(self):
-        if isDarkTheme():
-            self.setStyleSheet("QLabel {background-color: transparent; color: white}")
-        else:
-            self.setStyleSheet("QLabel {background-color: transparent; color: black}")
 
     def backButtonClicked(self):
         self.hide()
@@ -487,15 +466,6 @@ class SmallInfoCard(CardWidget):
         self.hBoxLayout.addStretch(0)
         self.hBoxLayout.addWidget(self.mainButton, 0, Qt.AlignRight)
         self.hBoxLayout.addSpacing(16)
-
-        self.setTheme()
-        qconfig.themeChanged.connect(self.setTheme)
-
-    def setTheme(self):
-        if isDarkTheme():
-            self.setStyleSheet("QLabel {background-color: transparent; color: white}")
-        else:
-            self.setStyleSheet("QLabel {background-color: transparent; color: black}")
 
     def setTitle(self, text: str):
         """
