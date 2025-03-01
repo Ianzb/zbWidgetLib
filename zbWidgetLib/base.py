@@ -11,4 +11,4 @@ from qfluentwidgets import *
 from qfluentwidgets.components.material import *
 from qfluentwidgets import FluentIcon as FIF
 
-import zbToolLib as f
+import zbToolLib as zb
