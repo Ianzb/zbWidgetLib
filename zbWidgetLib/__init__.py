@@ -31,7 +31,7 @@ class StatisticsWidget(QWidget):
 
 
 class Image(QLabel):
-    downloadFinishedSignal = Signal(bool)
+    downloadFinishedSignal = pyqtSignal(bool)
 
     @functools.singledispatchmethod
     def __init__(self, parent: QWidget = None):
@@ -534,7 +534,7 @@ class SmallInfoCard(CardWidget):
 
 
 class CardGroup(QWidget):
-    cardCountChanged = Signal(int)
+    cardCountChanged = pyqtSignal(int)
 
     @functools.singledispatchmethod
     def __init__(self, parent: QWidget = None):
