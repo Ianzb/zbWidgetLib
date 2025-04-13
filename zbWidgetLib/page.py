@@ -51,13 +51,6 @@ class BasicPage(BetterScrollArea):
         """
         self._icon = icon
 
-    def icon(self):
-        """
-        获取页面图标
-        :return: 图标
-        """
-        return self._icon
-
     def getIcon(self):
         """
         获取页面图标
@@ -88,17 +81,18 @@ class BasicTabPage(BasicPage):
         self.vBoxLayout.addWidget(self.pivot, 0, Qt.AlignHCenter)
         self.vBoxLayout.addWidget(self.stackedWidget)
 
-    def addPage(self, widget: QWidget, name: str = None):
+    def addPage(self, widget: QWidget, name: str = None, icon=None):
         """
         添加标签页
-        :param widget: 标签页对象，需设置icon属性为页面图标
+        :param widget: 标签页对象
         :param name: 名称
+        :param icon: 图标
         """
         if not name:
             name = widget.objectName()
         widget.setAlignment(Qt.AlignCenter)
         self.stackedWidget.addWidget(widget)
-        self.pivot.addItem(name, name, lambda: self.stackedWidget.setCurrentWidget(widget), widget.icon)
+        self.pivot.addItem(name, name, lambda: self.stackedWidget.setCurrentWidget(widget), icon)
         if self.stackedWidget.count() == 1:
             self.stackedWidget.setCurrentWidget(widget)
             self.pivot.setCurrentItem(widget.objectName())
