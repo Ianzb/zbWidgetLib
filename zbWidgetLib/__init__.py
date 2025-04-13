@@ -417,6 +417,13 @@ class BigInfoCard(CardWidget):
         """
         self.infoLabel.setText(data)
 
+    def setText(self, data: str):
+        """
+        设置文本
+        :param data: 文本
+        """
+        self.infoLabel.setText(data)
+
     def addUrl(self, text: str, url: str, icon=None):
         """
         添加链接
