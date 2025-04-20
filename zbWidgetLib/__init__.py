@@ -533,7 +533,7 @@ class SmallInfoCard(CardWidget):
         :param data: 文本
         :param pos: 位置：0 左上 1 左下 2 右上 3 右下
         """
-        self._text[pos] = zb.clearCharacters(data)
+        self._text[pos] = zb.clearCharacters(data, "escape")
         self.contentLabel1.setText(f"{self._text[0]}\n{self._text[1]}".strip())
         self.contentLabel2.setText(f"{self._text[2]}\n{self._text[3]}".strip())
 
