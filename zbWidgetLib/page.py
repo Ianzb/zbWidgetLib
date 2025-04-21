@@ -60,6 +60,7 @@ class BasicPage(BetterScrollArea):
 
 
 class BasicTabPage(BasicPage):
+    _pages = {}
 
     def __init__(self, parent: QWidget = None):
         """
@@ -90,12 +91,64 @@ class BasicTabPage(BasicPage):
         """
         if not name:
             name = widget.objectName()
+        if name in self._pages.keys():
+            raise NameError(f"页面名称{name}已存在，请替换为其他名称!")
         widget.setAlignment(Qt.AlignCenter)
         self.stackedWidget.addWidget(widget)
         self.pivot.addItem(name, name, lambda: self.stackedWidget.setCurrentWidget(widget), icon)
+        self._pages[name] = widget
         if self.stackedWidget.count() == 1:
-            self.stackedWidget.setCurrentWidget(widget)
-            self.pivot.setCurrentItem(widget.objectName())
+            self.pivot.setCurrentItem(name)
+
+    def setPage(self, name: str = None):
+        self.pivot.setCurrentItem(name)
+
+    def showPage(self, name: str = None):
+        self.setPage(name=name)
+
+    def getPage(self, name: str):
+        """
+        获取指定页面
+        :param name: 页面id
+        :return: 页面对象
+        """
+        return self._pages.get(name)
+
+    def page(self, name: str):
+        """
+        获取指定页面
+        :param name: 页面id
+        :return: 页面对象
+        """
+        return self.getPage(name=name)
+
+    def getPages(self):
+        """
+        获取所有页面
+        :return: 页面名称和对象的字典
+        """
+        return self._pages
+
+    def pages(self):
+        """
+        获取所有页面
+        :return: 页面名称和对象的字典
+        """
+        return self.getPages()
+
+    def removePage(self, name: str):
+        """
+        移除页面
+        :param name: 页面名称
+        :return:
+        """
+        if name not in self._pages.keys():
+            return False
+        widget = self._pages.pop(name)
+        widget.hide()
+        self.stackedWidget.removeWidget(widget)
+        self.pivot.removeWidget(name)
+        widget.deleteLater()
 
     def onCurrentIndexChanged(self, index: int):
         widget = self.stackedWidget.widget(index)

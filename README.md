@@ -1,6 +1,6 @@
 # [zb组件库（zbWidgetLib）](https://ianzb.github.io/project/zbWidgetLib.html)
 
-zb组件库（zbWidgetLib）是一个PySide6组件库，提供了一些便捷组件，目前用于zb小程序等个人Python项目中。
+zb组件库（zbWidgetLib）是一个PyQt5组件库，提供了一些便捷组件，目前用于zb小程序等个人Python项目中。
 
 ## 链接
 
@@ -17,3 +17,4 @@ zb组件库（zbWidgetLib）是一个PySide6组件库，提供了一些便捷组
 2025-04-13：1.0.0：更新页面图标设置方式。  
 2025-04-13：1.1.0：退回到PyQt5。  
 2025-04-20：1.1.0.1：修复SmallInfoCard文本处理的问题。  
+2025-04-21：1.1.1：更新BasicTabPage，新增大量实用方法，并修复首个标签页设置不正确的Bug。  
