@@ -2,7 +2,7 @@ from .base import *
 
 
 class BetterScrollArea(SmoothScrollArea):
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent=None):
         """
         优化样式的滚动区域
         :param parent:
@@ -27,22 +27,65 @@ class BetterScrollArea(SmoothScrollArea):
 
 
 class BasicPage(BetterScrollArea):
-    title = ""
-    subtitle = ""
 
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent=None, title: str = None, subtitle: str = None, icon=None):
         """
         基本页面，包含标题和子标题，适用于基本页面，通过类变量修改title和subtitle设置标题和子标题。
         :param parent:
         """
         super().__init__(parent=parent)
-        self.setObjectName(self.title)
 
-        self.toolBar = ToolBar(self.title, self.subtitle, self)
+        self.toolBar = ToolBar(self)
+        if title:
+            self.setTitle(title)
+        if subtitle:
+            self.setSubtitle(subtitle)
 
         self.setViewportMargins(0, self.toolBar.height(), 0, 0)
 
         self._icon = None
+
+    def getTitle(self):
+        """
+        获取主标题
+        :return: 主标题
+        """
+        return self.toolBar.title()
+
+    def title(self):
+        """
+        获取主标题
+        :return: 主标题
+        """
+        return self.getTitle()
+
+    def getSubtitle(self):
+        """
+        获取副标题
+        :return: 副标题
+        """
+        return self.toolBar.subtitle()
+
+    def subtitle(self):
+        """
+        获取副标题
+        :return: 副标题
+        """
+        return self.getSubtitle()
+
+    def setTitle(self, text: str):
+        """
+        设置主标题
+        :param text:
+        """
+        self.toolBar.setTitle(text)
+
+    def setSubtitle(self, text: str):
+        """
+        设置副标题
+        :param text:
+        """
+        self.toolBar.setSubtitle(text)
 
     def setIcon(self, icon):
         """
@@ -58,11 +101,18 @@ class BasicPage(BetterScrollArea):
         """
         return self._icon
 
+    def icon(self):
+        """
+        获取页面图标
+        :return: 图标
+        """
+        return self.getIcon()
+
 
 class BasicTabPage(BasicPage):
     _pages = {}
 
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent=None):
         """
         内置多标签页的页面，没有标题
         :param parent:
@@ -82,7 +132,7 @@ class BasicTabPage(BasicPage):
         self.vBoxLayout.addWidget(self.pivot, 0, Qt.AlignHCenter)
         self.vBoxLayout.addWidget(self.stackedWidget)
 
-    def addPage(self, widget: QWidget, name: str = None, icon=None):
+    def addPage(self, widget, name: str = None, icon=None):
         """
         添加标签页
         :param widget: 标签页对象
@@ -120,7 +170,7 @@ class BasicTabPage(BasicPage):
         :param name: 页面id
         :return: 页面对象
         """
-        return self.getPage(name=name)
+        return self.getPage(name)
 
     def getPages(self):
         """
@@ -150,6 +200,14 @@ class BasicTabPage(BasicPage):
         self.pivot.removeWidget(name)
         widget.deleteLater()
 
+    def deletePage(self, name: str):
+        """
+        删除页面
+        :param name: 页面名称
+        :return:
+        """
+        self.removePage(name)
+
     def onCurrentIndexChanged(self, index: int):
         widget = self.stackedWidget.widget(index)
         self.pivot.setCurrentItem(widget.objectName())
@@ -157,7 +215,7 @@ class BasicTabPage(BasicPage):
 
 class BasicTab(BasicPage):
 
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent=None):
         """
         基本的页面，没有边距和标题
         :param parent:
@@ -172,17 +230,17 @@ class ChangeableTab(BasicTab):
     可切换页面的页面
     """
 
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent=None):
         super().__init__(parent=parent)
         self._pages = {}
-        self.onShowPage = None
-        self.onShowName = None
+        self.on_show_page = None
+        self.on_show_wid = None
 
         self.vBoxLayout = QVBoxLayout(self)
         self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
         self.vBoxLayout.setSpacing(0)
 
-    def addPage(self, widget: QWidget, wid: str | int = None, alignment: Qt.AlignmentFlag = None):
+    def addPage(self, widget, wid: str | int = None, alignment: Qt.AlignmentFlag = None):
         """
         添加页面
         :param alignment: 对其方式
@@ -206,8 +264,8 @@ class ChangeableTab(BasicTab):
         """
         self.hidePage()
         self.getPage(wid).show()
-        self.onShowPage = self.getPage(wid)
-        self.onShowName = wid
+        self.on_show_page = self.getPage(wid)
+        self.on_show_wid = wid
 
     def setPage(self, wid: str | int):
         """
@@ -220,8 +278,8 @@ class ChangeableTab(BasicTab):
         """
         隐藏页面
         """
-        if self.onShowPage:
-            self.onShowPage.hide()
+        if self.on_show_page:
+            self.on_show_page.hide()
 
     def removePage(self, wid: str | int):
         """
@@ -244,13 +302,29 @@ class ChangeableTab(BasicTab):
         """
         return self._pages.get(wid)
 
+    def page(self, wid: str | int):
+        """
+        获取指定页面
+        :param wid: 页面id
+        :return:
+        """
+        return self.getPage(wid)
+
+    def pageAt(self, wid: str | int):
+        """
+        获取指定页面
+        :param wid: 页面id
+        :return:
+        """
+        return self.getPage(wid)
+
 
 class ToolBar(QWidget):
     """
     页面顶端工具栏
     """
 
-    def __init__(self, title: str, subtitle: str, parent=None):
+    def __init__(self, parent=None, title: str = None, subtitle: str = None):
         """
         :param title: 主标题
         :param subtitle: 副标题
@@ -268,3 +342,69 @@ class ToolBar(QWidget):
         self.vBoxLayout.addSpacing(4)
         self.vBoxLayout.addWidget(self.subtitleLabel)
         self.vBoxLayout.setAlignment(Qt.AlignTop)
+
+    def getTitle(self):
+        """
+        获取主标题
+        :return: 主标题
+        """
+        return self.titleLabel.text()
+
+    def title(self):
+        """
+        获取主标题
+        :return: 主标题
+        """
+        return self.getTitle()
+
+    def setTitle(self, text: str):
+        """
+        设置主标题
+        :param text: 主标题
+        """
+        self.titleLabel.setText(text)
+
+    def getSubtitle(self):
+        """
+        获取副标题
+        :return: 副标题
+        """
+        return self.subtitleLabel.text()
+
+    def subtitle(self):
+        """
+        获取副标题
+        :return: 副标题
+        """
+        return self.getSubtitle()
+
+    def setSubtitle(self, text: str):
+        """
+        设置副标题
+        :param text:
+        """
+        self.subtitleLabel.setText(text)
+
+
+class Window(FluentWindow):
+    """
+    主窗口
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def addPage(self, page, pos: str):
+        """
+        添加导航栏页面简易版
+        @param page: 页面对象
+        @param pos: 位置top/scroll/bottom
+        """
+        return self.addSubInterface(page, page.getIcon(), page.objectName(), eval(f"NavigationItemPosition.{pos.upper()}"))
+
+    def addSeparator(self, pos: str):
+        """
+        添加导航栏分割线简易版
+        @param pos: 位置top/scroll/bottom
+        """
+        self.navigationInterface.addSeparator(eval(f"NavigationItemPosition.{pos.upper()}"))

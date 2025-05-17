@@ -4,14 +4,14 @@ from .base import *
 from .page import *
 
 
-def setToolTip(widget: QWidget, text: str):
+def setToolTip(widget, text: str):
     widget.setToolTip(text)
     widget.installEventFilter(ToolTipFilter(widget, 1000))
 
 
 class StatisticsWidget(QWidget):
 
-    def __init__(self, title: str, value: str, parent: QWidget = None):
+    def __init__(self, title: str, value: str, parent=None):
         """
         两行信息组件
         :param title: 标题
@@ -29,12 +29,74 @@ class StatisticsWidget(QWidget):
         setFont(self.valueLabel, 18, QFont.Weight.DemiBold)
         self.titleLabel.setTextColor(QColor(96, 96, 96), QColor(206, 206, 206))
 
+    def getTitle(self):
+        """
+        获取标题
+        :return: 标题
+        """
+        return self.titleLabel.text()
+
+    def title(self):
+        """
+        获取标题
+        :return: 标题
+        """
+        return self.getTitle()
+
+    def setTitle(self, title: str):
+        """
+        设置标题
+        :param title: 标题
+        """
+        self.titleLabel.setText(title)
+
+    def getValue(self):
+        """
+        获取值
+        :return: 值
+        """
+        return self.valueLabel.text()
+
+    def value(self):
+        """
+        获取值
+        :return: 值
+        """
+        return self.getValue()
+
+    def setValue(self, value: str):
+        """
+        设置值
+        :param value: 值
+        """
+        self.valueLabel.setText(value)
+
 
 class Image(QLabel):
+    def __init__(self, parent=None):
+        """
+        图片组件
+        """
+        super().__init__(parent=parent)
+        self.setFixedSize(48, 48)
+        self.setScaledContents(True)
+
+    def setImg(self, path: str):
+        """
+        设置图片
+        :param path: 路径
+        :param url: 链接
+        :param thread_pool: 下载线程池
+        """
+        self.loading = False
+        self.setPixmap(QPixmap(path))
+
+
+class WebImage(QLabel):
     downloadFinishedSignal = pyqtSignal(bool)
 
     @functools.singledispatchmethod
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent=None):
         """
         图片组件（可实时下载）
         """
@@ -45,7 +107,7 @@ class Image(QLabel):
         self.downloadFinishedSignal.connect(self.downloadFinished)
 
     @__init__.register
-    def _(self, path: str, url: str = None, parent: QWidget = None, thread_pool: ThreadPoolExecutor = None):
+    def _(self, path: str, url: str = None, parent=None, thread_pool: ThreadPoolExecutor = None):
         """
         图片组件（可实时下载）
         :param path: 路径
@@ -58,7 +120,7 @@ class Image(QLabel):
             self.setImg(path, url, thread_pool)
 
     @__init__.register
-    def _(self, path: str, parent: QWidget = None):
+    def _(self, path: str, parent=None):
         """
         :param path: 路径
         """
@@ -99,56 +161,69 @@ class Image(QLabel):
 
 class CopyTextButton(ToolButton):
 
-    def __init__(self, text: str, data: str = "", parent: QWidget = None):
+    def __init__(self, text: str, data_type: str = "", parent=None):
         """
         复制文本按钮
         :param text: 复制的文本
-        :param data: 复制文本的提示信息，可以提示复制文本的内容类型
+        :param data_type: 复制文本的提示信息，可以提示复制文本的内容类型
         :param parent: 父组件
         """
         super().__init__(FIF.COPY, parent)
         self._text = text
-        self._data = data
+        self._data_type = data_type
         self.clicked.connect(self.copyButtonClicked)
-        if self._data is None:
-            self._data = ""
-        self.set(self._text, self._data)
+        if self._data_type is None:
+            self._data_type = ""
+        self.setData(self._text, self._data_type)
 
-    def set(self, text: str, data: str = ""):
+    def setData(self, text: str, data_type: str = ""):
         """
         设置信息
         :param text: 复制的文本
-        :param data: 复制文本的提示信息，可以提示复制文本的内容类型
+        :param data_type: 复制文本的提示信息，可以提示复制文本的内容类型
         :return:
         """
         if not text:
             self.setEnabled(False)
             return
         self._text = text
-        self._data = data
+        self._data_type = data_type
 
-        setToolTip(self, f"点击复制{self._data}信息！")
+        setToolTip(self, f"点击复制{self._data_type}信息！")
 
-    def text(self):
+    def getText(self):
         """
         复制的文本
         :return: 复制的文本
         """
         return self._text
 
+    def text(self):
+        """
+        复制的文本
+        :return: 复制的文本
+        """
+        return self.getText()
+
     def setText(self, text: str):
         """
         设置复制的文本
         :param text: 复制的文本
         """
-        self.set(text)
+        self.setData(text)
 
-    def setData(self, data: str):
+    def dataType(self):
+        return self._data_type
+
+    def getDataType(self):
+        return self.dataType()
+
+    def setDataType(self, data_type: str):
         """
         设置复制文本的提示信息
-        :param data: 复制文本的提示信息
+        :param data_type: 复制文本的提示信息
         """
-        self.set(self.text(), data)
+        self.setData(self.text(), data_type)
 
     def copyButtonClicked(self):
         clipboard = QApplication.clipboard()
@@ -157,14 +232,14 @@ class CopyTextButton(ToolButton):
 
 class DisplayCard(ElevatedCardWidget):
 
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent=None):
         """
         大图片卡片
         """
         super().__init__(parent)
         self.setFixedSize(168, 176)
 
-        self.widget = Image(self)
+        self.widget = WebImage(self)
 
         self.bodyLabel = CaptionLabel(self)
 
@@ -182,12 +257,19 @@ class DisplayCard(ElevatedCardWidget):
         """
         self.bodyLabel.setText(text)
 
-    def text(self):
+    def getText(self):
         """
         设置文本
         :return: 文本
         """
         return self.bodyLabel.text()
+
+    def text(self):
+        """
+        设置文本
+        :return: 文本
+        """
+        return self.getText()
 
     def setDisplay(self, widget):
         """
@@ -200,14 +282,14 @@ class DisplayCard(ElevatedCardWidget):
 
 class IntroductionCard(ElevatedCardWidget):
 
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent=None):
         """
         简介卡片
         """
         super().__init__(parent)
         self.setFixedSize(190, 200)
 
-        self.image = Image(self)
+        self.image = WebImage(self)
         self.titleLabel = SubtitleLabel(self)
         self.titleLabel.setWordWrap(True)
         self.bodyLabel = BodyLabel(self)
@@ -230,12 +312,40 @@ class IntroductionCard(ElevatedCardWidget):
         """
         self.image.setImg(path, url, thread_pool)
 
+    def getTitle(self):
+        """
+        设置标题
+        :return: 文本
+        """
+        return self.titleLabel.text()
+
+    def title(self):
+        """
+        设置标题
+        :return: 文本
+        """
+        return self.getTitle()
+
     def setTitle(self, text: str):
         """
         设置标题
         :param text: 文本
         """
         self.titleLabel.setText(text)
+
+    def getText(self):
+        """
+        设置标题
+        :return: 文本
+        """
+        return self.bodyLabel.text()
+
+    def text(self):
+        """
+        设置标题
+        :return: 文本
+        """
+        return self.getText()
 
     def setText(self, text: str):
         """
@@ -247,7 +357,7 @@ class IntroductionCard(ElevatedCardWidget):
 
 class LoadingCard(DisplayCard):
 
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent=None):
         """
         加载中卡片
         """
@@ -259,7 +369,7 @@ class LoadingCard(DisplayCard):
 
 class GrayCard(QWidget):
 
-    def __init__(self, title: str = None, parent: QWidget = None, alignment: Qt.AlignmentFlag = Qt.AlignLeft):
+    def __init__(self, title: str = None, parent=None, alignment: Qt.AlignmentFlag = Qt.AlignLeft):
         """
         灰色背景组件卡片
         :param title: 标题
@@ -320,7 +430,7 @@ class GrayCard(QWidget):
 
 class BigInfoCard(CardWidget):
 
-    def __init__(self, parent: QWidget = None, url: bool = True, tag: bool = True, data: bool = True):
+    def __init__(self, parent=None, url: bool = True, tag: bool = True, data: bool = True):
         """
         详细信息卡片
         :param url: 是否展示链接
@@ -334,7 +444,7 @@ class BigInfoCard(CardWidget):
         self.backButton.move(8, 8)
         self.backButton.setMaximumSize(32, 32)
 
-        self.image = Image(self)
+        self.image = WebImage(self)
 
         self.titleLabel = TitleLabel(self)
 
@@ -394,6 +504,20 @@ class BigInfoCard(CardWidget):
         self.hBoxLayout.addWidget(self.image, 0, Qt.AlignVCenter)
         self.hBoxLayout.addLayout(self.vBoxLayout)
 
+    def getTitle(self):
+        """
+        获取标题
+        :return: 文本
+        """
+        return self.titleLabel.text()
+
+    def title(self):
+        """
+        获取标题
+        :return: 文本
+        """
+        return self.getTitle()
+
     def setTitle(self, text: str):
         """
         设置标题
@@ -410,6 +534,20 @@ class BigInfoCard(CardWidget):
         """
         self.image.setImg(path, url, thread_pool)
 
+    def getInfo(self):
+        """
+        获取信息
+        :return: 文本
+        """
+        return self.infoLabel.text()
+
+    def info(self):
+        """
+        获取信息
+        :return: 文本
+        """
+        return self.getInfo()
+
     def setInfo(self, data: str):
         """
         设置信息
@@ -417,12 +555,59 @@ class BigInfoCard(CardWidget):
         """
         self.infoLabel.setText(data)
 
+    def getText(self):
+        """
+        获取信息
+        :return: 文本
+        """
+        return self.getInfo()
+
+    def text(self):
+        """
+        获取信息
+        :return: 文本
+        """
+        return self.getText()
+
     def setText(self, data: str):
         """
-        设置文本
+        设置信息
         :param data: 文本
         """
-        self.infoLabel.setText(data)
+        self.setInfo(data)
+
+    def getUrlFromIndex(self, index: int):
+        """
+        获取链接
+        :param index: 索引
+        :return: 链接
+        """
+        if index < 0 or index >= self.hBoxLayout2.count():
+            return None
+        button = self.hBoxLayout2.itemAt(index).widget()
+        if isinstance(button, HyperlinkButton):
+            return button.url
+        return None
+
+    def getUrl(self, index: int):
+        """
+        获取链接
+        :param index: 索引
+        :return: 链接
+        """
+        return self.getUrlFromIndex(index)
+
+    def getUrlIndexFromUrl(self, url: str):
+        """
+        获取链接索引
+        :param url: 链接
+        :return: 索引
+        """
+        for i in range(self.hBoxLayout2.count()):
+            button = self.hBoxLayout2.itemAt(i).widget()
+            if isinstance(button, HyperlinkButton) and button.getUrl() == url:
+                return i
+        return None
 
     def addUrl(self, text: str, url: str, icon=None):
         """
@@ -436,6 +621,51 @@ class BigInfoCard(CardWidget):
             button.setIcon(icon)
         self.hBoxLayout2.addWidget(button)
 
+    def getDataFromTitle(self, title: str):
+        """
+        获取数据
+        :param title: 标题
+        :return: 数据
+        """
+        for i in range(self.hBoxLayout3.count()):
+            widget = self.hBoxLayout3.itemAt(i).widget()
+            if isinstance(widget, StatisticsWidget) and widget.titleLabel.text() == title:
+                return widget.valueLabel.text()
+        return None
+
+    def getDataFromIndex(self, index: int):
+        """
+        获取数据
+        :param index: 索引
+        :return: 数据
+        """
+        if index < 0 or index >= self.hBoxLayout3.count():
+            return None
+        index = index * 2 - 2
+        widget = self.hBoxLayout3.itemAt(index).widget()
+        if isinstance(widget, StatisticsWidget):
+            return widget.valueLabel.text()
+        return None
+
+    def getData(self, info: int | str):
+        """
+        获取数据
+        :param info: 索引或标题
+        :return: 数据
+        """
+        if isinstance(info, int):
+            return self.getDataFromIndex(info)
+        elif isinstance(info, str):
+            return self.getDataFromTitle(info)
+
+    def data(self, info: int | str):
+        """
+        获取数据
+        :param info: 索引或标题
+        :return: 数据
+        """
+        return self.getData(info)
+
     def addData(self, title: str, data: str | int):
         """
         添加数据
@@ -448,6 +678,76 @@ class BigInfoCard(CardWidget):
             seperator.setMinimumHeight(50)
             self.hBoxLayout3.addWidget(seperator)
         self.hBoxLayout3.addWidget(widget)
+
+    def removeDataFromTitle(self, title: str):
+        """
+        移除数据
+        :param title: 标题
+        """
+        for i in range(self.hBoxLayout3.count()):
+            widget = self.hBoxLayout3.itemAt(i).widget()
+            if isinstance(widget, StatisticsWidget) and widget.titleLabel.text() == title:
+                self.hBoxLayout3.removeWidget(widget)
+                widget.deleteLater()
+                if i > 0:
+                    seperator = self.hBoxLayout3.itemAt(i - 1).widget()
+                    if isinstance(seperator, VerticalSeparator):
+                        self.hBoxLayout3.removeWidget(seperator)
+                        seperator.deleteLater()
+                break
+
+    def removeDataFromIndex(self, index: int):
+        """
+        移除数据
+        :param index: 索引
+        """
+        if index < 0 or index >= self.hBoxLayout3.count():
+            return
+        index = index * 2 - 2
+        widget = self.hBoxLayout3.itemAt(index).widget()
+        if isinstance(widget, StatisticsWidget):
+            self.hBoxLayout3.removeWidget(widget)
+            widget.deleteLater()
+            if index > 0:
+                seperator = self.hBoxLayout3.itemAt(index - 1).widget()
+                if isinstance(seperator, VerticalSeparator):
+                    self.hBoxLayout3.removeWidget(seperator)
+                    seperator.deleteLater()
+
+    def removeData(self, info: int | str):
+        if isinstance(info, int):
+            self.removeDataFromIndex(info)
+        elif isinstance(info, str):
+            self.removeDataFromTitle(info)
+
+    def getTagFromIndex(self, index: int):
+        """
+        获取标签
+        :param index: 索引
+        :return: 标签
+        """
+        if index < 0 or index >= self.hBoxLayout4.count():
+            return None
+        button = self.hBoxLayout4.itemAt(index).widget()
+        if isinstance(button, PillPushButton):
+            return button.text()
+        return None
+
+    def getTag(self, index: int):
+        """
+        获取标签
+        :param index: 索引
+        :return: 标签
+        """
+        return self.getTagFromIndex(index)
+
+    def tag(self, index: int):
+        """
+        获取标签
+        :param index: 索引
+        :return: 标签
+        """
+        return self.getTagFromIndex(index)
 
     def addTag(self, name: str):
         """
@@ -463,7 +763,7 @@ class BigInfoCard(CardWidget):
 
 class SmallInfoCard(CardWidget):
 
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent=None):
         """
         普通信息卡片（搜索列表展示）
         """
@@ -471,7 +771,7 @@ class SmallInfoCard(CardWidget):
         self.setMinimumWidth(100)
         self.setFixedHeight(73)
 
-        self.image = Image(self)
+        self.image = WebImage(self)
 
         self.titleLabel = BodyLabel(self)
 
@@ -527,13 +827,29 @@ class SmallInfoCard(CardWidget):
         """
         self.image.setImg(path, url, thread_pool)
 
+    def getText(self, pos: int):
+        """
+        获取文本
+        :param pos: 位置：0 左上 1 左下 2 右上 3 右下
+        :return: 文本
+        """
+        return self._text[pos]
+
+    def text(self, pos: int):
+        """
+        获取文本
+        :param pos: 位置：0 左上 1 左下 2 右上 3 右下
+        :return: 文本
+        """
+        return self.getText(pos)
+
     def setText(self, data: str, pos: int):
         """
         设置文本
         :param data: 文本
         :param pos: 位置：0 左上 1 左下 2 右上 3 右下
         """
-        self._text[pos] = zb.clearCharacters(data, "escape")
+        self._text[pos] = zb.clearEscapeCharaters(data)
         self.contentLabel1.setText(f"{self._text[0]}\n{self._text[1]}".strip())
         self.contentLabel2.setText(f"{self._text[2]}\n{self._text[3]}".strip())
 
@@ -544,7 +860,7 @@ class CardGroup(QWidget):
     cardCountChanged = pyqtSignal(int)
 
     @functools.singledispatchmethod
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent=None):
         """
         卡片组
         :param parent:
@@ -564,12 +880,12 @@ class CardGroup(QWidget):
         self.vBoxLayout.addSpacing(12)
 
     @__init__.register
-    def _(self, title: str = None, parent: QWidget = None):
+    def _(self, title: str = None, parent=None):
         self.__init__(parent)
         if title:
             self.titleLabel.setText(title)
 
-    def addCard(self, card: QWidget, wid: str | int, pos: int = -1):
+    def addCard(self, card, wid: str | int, pos: int = -1):
         """
         添加卡片
         :param card: 卡片组件
@@ -606,6 +922,14 @@ class CardGroup(QWidget):
         """
         return self._cardMap.get(wid)
 
+    def card(self, wid: str | int):
+        """
+        寻找卡片
+        :param wid: 卡片组件id
+        :return: 卡片组件
+        """
+        return self.getCard(wid)
+
     def count(self):
         """
         卡片数量
@@ -619,6 +943,20 @@ class CardGroup(QWidget):
         """
         while self._cardMap:
             self.removeCard(next(iter(self._cardMap)))
+
+    def getTitle(self):
+        """
+        获取标题
+        :return: 文本
+        """
+        return self.titleLabel.text()
+
+    def title(self):
+        """
+        获取标题
+        :return: 文本
+        """
+        return self.getTitle()
 
     def setTitle(self, text: str):
         """
