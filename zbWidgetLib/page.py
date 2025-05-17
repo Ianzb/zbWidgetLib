@@ -324,7 +324,7 @@ class ToolBar(QWidget):
     页面顶端工具栏
     """
 
-    def __init__(self, parent=None, title: str = None, subtitle: str = None):
+    def __init__(self, parent=None, title: str = "", subtitle: str = ""):
         """
         :param title: 主标题
         :param subtitle: 副标题
@@ -394,17 +394,18 @@ class Window(FluentWindow):
     def __init__(self):
         super().__init__()
 
-    def addPage(self, page, pos: str):
+    def addPage(self, page, name: str, icon, pos: str):
         """
         添加导航栏页面简易版
-        @param page: 页面对象
-        @param pos: 位置top/scroll/bottom
+        :param page: 页面对象
+        :param pos: 位置top/scroll/bottom
         """
-        return self.addSubInterface(page, page.getIcon(), page.objectName(), eval(f"NavigationItemPosition.{pos.upper()}"))
+        page.setObjectName(name)
+        return self.addSubInterface(page, icon, name, eval(f"NavigationItemPosition.{pos.upper()}"))
 
     def addSeparator(self, pos: str):
         """
         添加导航栏分割线简易版
-        @param pos: 位置top/scroll/bottom
+        :param pos: 位置top/scroll/bottom
         """
         self.navigationInterface.addSeparator(eval(f"NavigationItemPosition.{pos.upper()}"))
