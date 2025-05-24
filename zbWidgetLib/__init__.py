@@ -983,6 +983,7 @@ class FileChooser(QFrame):
         self.show_suffixs = False
         self.default_path = None
         self.description = None
+        self._drag = False
 
         self.setFixedSize(150, 115)
 
@@ -1010,16 +1011,17 @@ class FileChooser(QFrame):
 
         self.setAcceptDrops(True)
 
-        self.fileChoosedSignal.connect(self.fileChoosed)
-
-    def fileChoosed(self, msg):
-        print(msg)
-
     def setTheme(self):
         if isDarkTheme():
-            self.setStyleSheet(".FileChooser {border: 2px rgb(121, 121, 121); border-style: dashed; border-radius: 6px}")
+            if self._drag:
+                self.setStyleSheet(".FileChooser {border: 2px rgb(121, 121, 121); border-style: dashed; border-radius: 6px; background-color: rgba(100, 100, 100, 0.5)}")
+            else:
+                self.setStyleSheet(".FileChooser {border: 2px rgb(121, 121, 121); border-style: dashed; border-radius: 6px; background-color: rgba(121, 121, 121, 0)}")
         else:
-            self.setStyleSheet(".FileChooser {border: 2px rgb(145, 145, 145); border-style: dashed; border-radius: 6px}")
+            if self._drag:
+                self.setStyleSheet(".FileChooser {border: 2px rgb(145, 145, 145); border-style: dashed; border-radius: 6px; background-color: rgba(220, 220, 220, 0.5)}")
+            else:
+                self.setStyleSheet(".FileChooser {border: 2px rgb(145, 145, 145); border-style: dashed; border-radius: 6px; background-color: rgba(145, 145, 145, 0)}")
 
     def chooseFileButtonClicked(self):
         text = f"浏览{f"文件{"夹" if self.mode == "folder" else ""}" if not self.description else self.description}"
@@ -1072,11 +1074,15 @@ class FileChooser(QFrame):
             urls = [i.toLocalFile() for i in event.mimeData().urls()]
             if self._checkDragFile(urls):
                 event.acceptProposedAction()
+                self._drag = True
                 self.label1.setText(f"松开即可选择")
                 self.label2.hide()
+                self.setTheme()
 
     def dragLeaveEvent(self, event):
         self._setText()
+        self._drag = False
+        self.setTheme()
 
     def dropEvent(self, event):
         if event.mimeData().hasUrls():
@@ -1084,6 +1090,8 @@ class FileChooser(QFrame):
             if self._checkDragFile(urls):
                 self.fileChoosedSignal.emit(urls)
                 self._setText()
+                self._drag = False
+                self.setTheme()
 
     def _setText(self):
         self.label1.setText(f"拖拽{", ".join([", ".join(v).replace(".", "").upper() for k, v in self.suffixs.items()]) if self.show_suffixs and self.mode == "file" else ""}{f"文件{"夹" if self.mode == "folder" else ""}" if not self.description else self.description}到框内")
