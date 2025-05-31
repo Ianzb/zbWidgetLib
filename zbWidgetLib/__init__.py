@@ -403,9 +403,9 @@ class GrayCard(QWidget):
 
     def setTheme(self):
         if isDarkTheme():
-            self.card.setStyleSheet(".GrayCard {background-color: rgba(25,25,25,0.5); border:1px solid rgba(20,20,20,0.15); border-radius: 10px}")
+            self.card.setStyleSheet("GrayCard > QFrame {background-color: rgba(25,25,25,0.5); border:1px solid rgba(20,20,20,0.15); border-radius: 10px}")
         else:
-            self.card.setStyleSheet(".GrayCard {background-color: rgba(175,175,175,0.1); border:1px solid rgba(150,150,150,0.15); border-radius: 10px}")
+            self.card.setStyleSheet("GrayCard > QFrame {background-color: rgba(175,175,175,0.1); border:1px solid rgba(150,150,150,0.15); border-radius: 10px}")
 
     def addWidget(self, widget, spacing=0, alignment: Qt.AlignmentFlag = Qt.AlignTop):
         """
