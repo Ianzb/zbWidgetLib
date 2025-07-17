@@ -143,7 +143,6 @@ class BasicTabPage(BasicPage):
             name = widget.objectName()
         if name in self._pages.keys():
             raise NameError(f"页面名称{name}已存在，请替换为其他名称!")
-        widget.setAlignment(Qt.AlignCenter)
         self.stackedWidget.addWidget(widget)
         self.pivot.addItem(name, name, lambda: self.stackedWidget.setCurrentWidget(widget), icon)
         self._pages[name] = widget
