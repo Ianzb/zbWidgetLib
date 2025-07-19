@@ -1196,3 +1196,48 @@ class FileChooser(QFrame):
         """
         self.suffixs = {}
         self._setText()
+
+class LoadingMessageBox(MaskDialogBase):
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+
+        self._hBoxLayout.removeWidget(self.widget)
+        self._hBoxLayout.addWidget(self.widget, 1, Qt.AlignCenter)
+        self.vBoxLayout = QVBoxLayout(self.widget)
+        self.vBoxLayout.setSpacing(0)
+        self.vBoxLayout.setContentsMargins(16, 16, 16, 16)
+
+        self.setShadowEffect(60, (0, 10), QColor(0, 0, 0, 50))
+        self.setMaskColor(QColor(0, 0, 0, 76))
+
+        self.processRing = ProgressRing()
+        self.loadingCard = zbw.DisplayCard(self.widget)
+        setattr(self.loadingCard, "_normalBackgroundColor", lambda: QColor(16, 16, 16, 220) if isDarkTheme() else QColor(255, 255, 255, 220))
+        setattr(self.loadingCard, "_hoverBackgroundColor", lambda: QColor(16, 16, 16, 255) if isDarkTheme() else QColor(255, 255, 255, 255))
+        setattr(self.loadingCard, "_pressedBackgroundColor", lambda: QColor(16, 16, 16, 110) if isDarkTheme() else QColor(255, 255, 255, 110))
+        self.loadingCard.setBackgroundColor(QColor(16, 16, 16, 220) if isDarkTheme() else QColor(255, 255, 255, 220))
+
+        self.loadingCard.setDisplay(self.processRing)
+        self.vBoxLayout.addWidget(self.loadingCard, 1)
+
+    def setVal(self, val: int):
+        self.processRing.setVal(val)
+
+    def setProgress(self, val: int):
+        self.setVal(val)
+
+    def getVal(self):
+        return self.processRing.getVal()
+
+    def setText(self, text: str):
+        self.loadingCard.setText(text)
+
+    def getText(self):
+        return self.loadingCard.getText()
+
+    def finish(self):
+        self.accept()
+
+    def close(self):
+        self.finish()
+        super().close()
