@@ -23,4 +23,4 @@ zb组件库（zbWidgetLib）是一个PyQt5组件库，提供了一些便捷组�
 2025-05-24：2.0.0b5：优化GrayCard的QSS。  
 2025-05-31：2.0.0：修复GrayCard的QSS。  
 2025-07-17：2.0.1：优化添加标签页。  
-2025-07-19：2.1.0：新增LoadingMessageBox。  
+2025-07-19：2.1.0.1：新增LoadingMessageBox。  

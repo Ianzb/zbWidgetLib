@@ -1211,7 +1211,7 @@ class LoadingMessageBox(MaskDialogBase):
         self.setMaskColor(QColor(0, 0, 0, 76))
 
         self.processRing = ProgressRing()
-        self.loadingCard = zbw.DisplayCard(self.widget)
+        self.loadingCard = DisplayCard(self.widget)
         setattr(self.loadingCard, "_normalBackgroundColor", lambda: QColor(16, 16, 16, 220) if isDarkTheme() else QColor(255, 255, 255, 220))
         setattr(self.loadingCard, "_hoverBackgroundColor", lambda: QColor(16, 16, 16, 255) if isDarkTheme() else QColor(255, 255, 255, 255))
         setattr(self.loadingCard, "_pressedBackgroundColor", lambda: QColor(16, 16, 16, 110) if isDarkTheme() else QColor(255, 255, 255, 110))
