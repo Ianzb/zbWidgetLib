@@ -1197,6 +1197,7 @@ class FileChooser(QFrame):
         self.suffixs = {}
         self._setText()
 
+
 class LoadingMessageBox(MaskDialogBase):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -1241,3 +1242,16 @@ class LoadingMessageBox(MaskDialogBase):
     def close(self):
         self.finish()
         super().close()
+
+    def done(self, code):
+        """ fade out """
+        self.widget.setGraphicsEffect(None)
+        opacityEffect = QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(opacityEffect)
+        opacityAni = QPropertyAnimation(opacityEffect, b'opacity', self)
+        opacityAni.setStartValue(1)
+        opacityAni.setEndValue(0)
+        opacityAni.setDuration(100)
+        opacityAni.finished.connect(lambda: self._onDone(code))
+        opacityAni.finished.connect(self.deleteLater)
+        opacityAni.start()
