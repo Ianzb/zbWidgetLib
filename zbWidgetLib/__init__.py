@@ -11,7 +11,7 @@ def setToolTip(widget, text: str):
 
 class StatisticsWidget(QWidget):
 
-    def __init__(self, title: str, value: str, parent=None):
+    def __init__(self, title: str, value: str, parent=None, select_text: bool = False):
         """
         两行信息组件
         :param title: 标题
@@ -20,6 +20,10 @@ class StatisticsWidget(QWidget):
         super().__init__(parent=parent)
         self.titleLabel = CaptionLabel(title, self)
         self.valueLabel = BodyLabel(value, self)
+
+        if select_text:
+            self.titleLabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            self.valueLabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
 
         self.vBoxLayout = QVBoxLayout(self)
         self.vBoxLayout.setContentsMargins(16, 0, 16, 0)
@@ -429,7 +433,7 @@ class GrayCard(QWidget):
 
 class BigInfoCard(CardWidget):
 
-    def __init__(self, parent=None, url: bool = True, tag: bool = True, data: bool = True):
+    def __init__(self, parent=None, url: bool = True, tag: bool = True, data: bool = True, select_text: bool = False):
         """
         详细信息卡片
         :param url: 是否展示链接
@@ -438,6 +442,8 @@ class BigInfoCard(CardWidget):
         """
         super().__init__(parent)
         self.setMinimumWidth(100)
+
+        self.select_text = select_text
 
         self.backButton = TransparentToolButton(FIF.RETURN, self)
         self.backButton.move(8, 8)
@@ -452,6 +458,10 @@ class BigInfoCard(CardWidget):
 
         self.infoLabel = BodyLabel(self)
         self.infoLabel.setWordWrap(True)
+
+        if select_text:
+            self.titleLabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            self.infoLabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
 
         self.hBoxLayout1 = QHBoxLayout()
         self.hBoxLayout1.setContentsMargins(0, 0, 0, 0)
@@ -671,7 +681,7 @@ class BigInfoCard(CardWidget):
         :param title: 标题
         :param data: 数据
         """
-        widget = StatisticsWidget(title, str(data), self)
+        widget = StatisticsWidget(title, str(data), self, self.select_text)
         if self.hBoxLayout3.count() >= 1:
             seperator = VerticalSeparator(widget)
             seperator.setMinimumHeight(50)
@@ -762,7 +772,7 @@ class BigInfoCard(CardWidget):
 
 class SmallInfoCard(CardWidget):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, select_text: bool = False):
         """
         普通信息卡片（搜索列表展示）
         """
@@ -782,6 +792,11 @@ class SmallInfoCard(CardWidget):
         self.contentLabel2 = CaptionLabel(f"{self._text[2]}\n{self._text[3]}", self)
         self.contentLabel2.setTextColor("#606060", "#d2d2d2")
         self.contentLabel2.setAlignment(Qt.AlignRight)
+
+        if select_text:
+            self.titleLabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            self.contentLabel1.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            self.contentLabel2.setTextInteractionFlags(Qt.TextSelectableByMouse)
 
         self.mainButton = PushButton("", self)
 
@@ -1199,7 +1214,7 @@ class FileChooser(QFrame):
 
 
 class LoadingMessageBox(MaskDialogBase):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, is_random: bool = True):
         super().__init__(parent=parent)
 
         self._hBoxLayout.removeWidget(self.widget)
@@ -1211,7 +1226,10 @@ class LoadingMessageBox(MaskDialogBase):
         self.setShadowEffect(60, (0, 10), QColor(0, 0, 0, 50))
         self.setMaskColor(QColor(0, 0, 0, 76))
 
-        self.processRing = ProgressRing()
+        if is_random:
+            self.processRing = ProgressRing()
+        else:
+            self.processRing = IndeterminateProgressRing()
         self.loadingCard = DisplayCard(self.widget)
         setattr(self.loadingCard, "_normalBackgroundColor", lambda: QColor(16, 16, 16, 220) if isDarkTheme() else QColor(255, 255, 255, 220))
         setattr(self.loadingCard, "_hoverBackgroundColor", lambda: QColor(16, 16, 16, 255) if isDarkTheme() else QColor(255, 255, 255, 255))
