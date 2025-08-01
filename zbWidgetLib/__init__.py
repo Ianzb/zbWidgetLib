@@ -361,14 +361,29 @@ class IntroductionCard(ElevatedCardWidget):
 
 class LoadingCard(DisplayCard):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, is_random: bool = True):
         """
         加载中卡片
         """
         super().__init__(parent)
-        self.progressRingLoading = IndeterminateProgressRing(self)
-        self.setDisplay(self.progressRingLoading)
+        if is_random:
+            self.progressRing = IndeterminateProgressRing()
+        else:
+            self.progressRing = ProgressRing()
+        self.setDisplay(self.progressRing)
         self.setText("加载中...")
+
+    def setVal(self, val: int):
+        self.progressRing.setVal(val)
+
+    def setProgress(self, val: int):
+        self.setVal(val)
+
+    def getVal(self):
+        return self.progressRing.getVal()
+
+    def getProgress(self):
+        return self.getVal()
 
 
 class GrayCard(QWidget):
@@ -1227,26 +1242,29 @@ class LoadingMessageBox(MaskDialogBase):
         self.setMaskColor(QColor(0, 0, 0, 76))
 
         if is_random:
-            self.processRing = ProgressRing()
+            self.progressRing = IndeterminateProgressRing()
         else:
-            self.processRing = IndeterminateProgressRing()
+            self.progressRing = ProgressRing()
         self.loadingCard = DisplayCard(self.widget)
         setattr(self.loadingCard, "_normalBackgroundColor", lambda: QColor(16, 16, 16, 220) if isDarkTheme() else QColor(255, 255, 255, 220))
         setattr(self.loadingCard, "_hoverBackgroundColor", lambda: QColor(16, 16, 16, 255) if isDarkTheme() else QColor(255, 255, 255, 255))
         setattr(self.loadingCard, "_pressedBackgroundColor", lambda: QColor(16, 16, 16, 110) if isDarkTheme() else QColor(255, 255, 255, 110))
         self.loadingCard.setBackgroundColor(QColor(16, 16, 16, 220) if isDarkTheme() else QColor(255, 255, 255, 220))
 
-        self.loadingCard.setDisplay(self.processRing)
+        self.loadingCard.setDisplay(self.progressRing)
         self.vBoxLayout.addWidget(self.loadingCard, 1)
 
     def setVal(self, val: int):
-        self.processRing.setVal(val)
+        self.progressRing.setVal(val)
 
     def setProgress(self, val: int):
         self.setVal(val)
 
     def getVal(self):
-        return self.processRing.getVal()
+        return self.progressRing.getVal()
+
+    def getProgress(self):
+        return self.getVal()
 
     def setText(self, text: str):
         self.loadingCard.setText(text)
