@@ -781,7 +781,7 @@ class BigInfoCard(CardWidget):
         self.tagButton = PillPushButton(name, self)
         self.tagButton.setCheckable(False)
         setFont(self.tagButton, 12)
-        self.tagButton.setFixedSize(80, 32)
+        self.tagButton.setFixedHeight(32)
         self.hBoxLayout4.addWidget(self.tagButton)
 
 
@@ -1246,6 +1246,7 @@ class LoadingMessageBox(MaskDialogBase):
         else:
             self.progressRing = ProgressRing()
         self.loadingCard = DisplayCard(self.widget)
+        self.loadingCard.setText("加载中...")
         setattr(self.loadingCard, "_normalBackgroundColor", lambda: QColor(16, 16, 16, 220) if isDarkTheme() else QColor(255, 255, 255, 220))
         setattr(self.loadingCard, "_hoverBackgroundColor", lambda: QColor(16, 16, 16, 255) if isDarkTheme() else QColor(255, 255, 255, 255))
         setattr(self.loadingCard, "_pressedBackgroundColor", lambda: QColor(16, 16, 16, 110) if isDarkTheme() else QColor(255, 255, 255, 110))
@@ -1291,3 +1292,155 @@ class LoadingMessageBox(MaskDialogBase):
         opacityAni.finished.connect(lambda: self._onDone(code))
         opacityAni.finished.connect(self.deleteLater)
         opacityAni.start()
+
+
+class SaveFilePushButton(PushButton):
+    fileChoosedSignal = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.suffixs = {}
+        self.default_path = None
+        self.description = None
+
+        self.setText("导出")
+
+        self.clicked.connect(self.clickEvent)
+
+    def clickEvent(self):
+        text = f"浏览{f"文件" if not self.description else self.description}"
+        suffixs = ";;".join([f"{k} ({" ".join(["*" + i.lower() for i in v])})" for k, v in self.suffixs.items()])
+        file_name, _ = QFileDialog.getSaveFileName(self, text, self.default_path if self.default_path else "C:/", suffixs)
+        if file_name:
+            self.fileChoosedSignal.emit(file_name)
+
+    def getDescription(self):
+        """
+        获取文件选择器描述
+        :return: str
+        """
+        return self.description
+
+    def setDescription(self, description: str):
+        """
+        设置文件选择器描述
+        :param description: 描述
+        """
+        self.description = description
+        self.setText(f"导出{description}")
+
+    def getDefaultPath(self):
+        """
+        获取默认路径
+        :return: str
+        """
+        return self.default_path
+
+    def setDefaultPath(self, path: str):
+        """
+        设置默认路径
+        :param path: 默认路径
+        """
+        self.default_path = path
+
+    def getSuffix(self):
+        """
+        获取文件选择器后缀
+        """
+        return self.suffixs
+
+    def setSuffix(self, suffixs: dict):
+        """
+        设置文件选择器后缀
+        :param suffixs: 后缀字典，格式如{"Word文档":[".doc",".docx"],"Excel表格":[".xls",".xlsx"],"PDF文档":[".pdf"]}
+        """
+        self.suffixs = suffixs
+
+    def addSuffix(self, suffix: dict):
+        """
+        添加文件选择器后缀
+        :param suffix: 后缀字典，格式如{"Word文档":[".doc",".docx"],"Excel表格":[".xls",".xlsx"],"PDF文档":[".pdf"]}
+        """
+        self.suffixs.update(suffix)
+
+    def clearSuffix(self):
+        """
+        清除文件选择器后缀
+        """
+        self.suffixs = {}
+
+
+class SaveFilePrimaryPushButton(PrimaryPushButton):
+    fileChoosedSignal = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.suffixs = {}
+        self.default_path = None
+        self.description = None
+
+        self.setText("导出")
+
+        self.clicked.connect(self.clickEvent)
+
+    def clickEvent(self):
+        text = f"浏览{f"文件" if not self.description else self.description}"
+        suffixs = ";;".join([f"{k} ({" ".join(["*" + i.lower() for i in v])})" for k, v in self.suffixs.items()])
+        file_name, _ = QFileDialog.getSaveFileName(self, text, self.default_path if self.default_path else "C:/", suffixs)
+        if file_name:
+            self.fileChoosedSignal.emit(file_name)
+
+    def getDescription(self):
+        """
+        获取文件选择器描述
+        :return: str
+        """
+        return self.description
+
+    def setDescription(self, description: str):
+        """
+        设置文件选择器描述
+        :param description: 描述
+        """
+        self.description = description
+        self.setText(f"导出{description}")
+
+    def getDefaultPath(self):
+        """
+        获取默认路径
+        :return: str
+        """
+        return self.default_path
+
+    def setDefaultPath(self, path: str):
+        """
+        设置默认路径
+        :param path: 默认路径
+        """
+        self.default_path = path
+
+    def getSuffix(self):
+        """
+        获取文件选择器后缀
+        """
+        return self.suffixs
+
+    def setSuffix(self, suffixs: dict):
+        """
+        设置文件选择器后缀
+        :param suffixs: 后缀字典，格式如{"Word文档":[".doc",".docx"],"Excel表格":[".xls",".xlsx"],"PDF文档":[".pdf"]}
+        """
+        self.suffixs = suffixs
+
+    def addSuffix(self, suffix: dict):
+        """
+        添加文件选择器后缀
+        :param suffix: 后缀字典，格式如{"Word文档":[".doc",".docx"],"Excel表格":[".xls",".xlsx"],"PDF文档":[".pdf"]}
+        """
+        self.suffixs.update(suffix)
+
+    def clearSuffix(self):
+        """
+        清除文件选择器后缀
+        """
+        self.suffixs = {}
