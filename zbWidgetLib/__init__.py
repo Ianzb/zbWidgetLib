@@ -6,7 +6,7 @@ from .page import *
 
 def setToolTip(widget, text: str):
     widget.setToolTip(text)
-    widget.installEventFilter(ToolTipFilter(widget, 1000))
+    widget.installEventFilter(AcrylicToolTipFilter(widget, 1000))
 
 
 class StatisticsWidget(QWidget):

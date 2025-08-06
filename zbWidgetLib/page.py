@@ -110,7 +110,6 @@ class BasicPage(BetterScrollArea):
 
 
 class BasicTabPage(BasicPage):
-    _pages = {}
 
     def __init__(self, parent=None):
         """
@@ -118,6 +117,8 @@ class BasicTabPage(BasicPage):
         :param parent:
         """
         super().__init__(parent=parent)
+
+        self._pages = {}
 
         self.toolBar.deleteLater()
 
