@@ -889,29 +889,45 @@ class CardGroup(QWidget):
     cardCountChanged = pyqtSignal(int)
 
     @functools.singledispatchmethod
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, show_title: bool = False, is_v: bool = True):
         """
         卡片组
         :param parent:
+        :param show_title: 是否显示标题
+        :param is_v: 是否竖向排列
         """
         super().__init__(parent=parent)
+        self.show_title = show_title
+        self.is_v = is_v
         self._cards = []
-
         self._cardMap = {}
 
-        self.titleLabel = StrongBodyLabel(self)
+        if show_title:
+            self.titleLabel = StrongBodyLabel(self)
+        if self.is_v:
+            self.boxLayout = QVBoxLayout(self)
+        else:
+            self.boxLayout = QHBoxLayout(self)
+        self.boxLayout.setSpacing(5)
+        self.boxLayout.setContentsMargins(0, 0, 0, 0)
+        self.boxLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        if show_title:
+            self.boxLayout.addWidget(self.titleLabel)
+            self.boxLayout.addSpacing(12)
 
-        self.vBoxLayout = QVBoxLayout(self)
-        self.vBoxLayout.setSpacing(5)
-        self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
-        self.vBoxLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.vBoxLayout.addWidget(self.titleLabel)
-        self.vBoxLayout.addSpacing(12)
+        self.vBoxLayout = self.boxLayout
+        self.hBoxLayout = self.boxLayout
 
     @__init__.register
-    def _(self, title: str = None, parent=None):
-        self.__init__(parent)
-        if title:
+    def _(self, title: str, parent=None, is_v: bool = True):
+        """
+        卡片组
+        :param title: 标题文本
+        :param parent:
+        :param is_v: 是否竖向排列
+        """
+        self.__init__(parent, True, is_v)
+        if title and self.show_title:
             self.titleLabel.setText(title)
 
     def addCard(self, card, wid: str | int, pos: int = -1):
@@ -923,7 +939,7 @@ class CardGroup(QWidget):
         """
         if pos >= 0:
             pos += 1
-        self.vBoxLayout.insertWidget(pos, card, 0, Qt.AlignmentFlag.AlignTop)
+        self.boxLayout.insertWidget(pos, card, 0, Qt.AlignmentFlag.AlignTop)
         self._cards.append(card)
         self._cardMap[wid] = card
 
@@ -937,7 +953,7 @@ class CardGroup(QWidget):
 
         card = self._cardMap.pop(wid)
         self._cards.remove(card)
-        self.vBoxLayout.removeWidget(card)
+        self.boxLayout.removeWidget(card)
         card.hide()
         card.deleteLater()
 
@@ -1444,3 +1460,115 @@ class SaveFilePrimaryPushButton(PrimaryPushButton):
         清除文件选择器后缀
         """
         self.suffixs = {}
+
+
+class PageSpliter(QWidget):
+    pageChanged = pyqtSignal(int)
+
+    def __init__(self, parent=None, max_number: int = 10, max_visible: int = 10):
+        """
+        分页器组件，通过pageChanged绑定页面修改事件
+        :param parent:
+        :param max_number: 最大页码
+        :param max_visible: 同时显示数量
+        """
+        super().__init__(parent)
+        self.max_number = max_number
+        self.max_visible = max_visible
+        self.number = 0
+        self._buttons = {}
+        self.hBoxLayout = QHBoxLayout(self)
+        self.hBoxLayout.setSpacing(8)
+
+        self.leftButton = TransparentToolButton(FIF.CARE_LEFT_SOLID, self)
+        self.leftButton.clicked.connect(lambda: self.setNumber(self.number - 1))
+
+        self.numberButtons = []
+
+        for i in range(self.max_visible):
+            btn = TransparentToggleToolButton(self)
+            btn.clicked.connect(self._createButtonHandler(i))
+            self.numberButtons.append(btn)
+            self.hBoxLayout.addWidget(btn, 0, Qt.AlignLeft)
+
+        self.rightButton = TransparentToolButton(FIF.CARE_RIGHT_SOLID, self)
+        self.rightButton.clicked.connect(lambda: self.setNumber(self.number + 1))
+
+        self.label1 = BodyLabel("页", self)
+        self.lineEdit = LineEdit(self)
+        self.lineEdit.setMaximumWidth(50)
+        if self.max_number <= 0:
+            self.lineEdit.setValidator(QIntValidator(1, 1000))
+        else:
+            self.lineEdit.setValidator(QIntValidator(1, self.max_number))
+        self.lineEdit.returnPressed.connect(lambda: self.setNumber(int(self.lineEdit.text())))
+
+        self.label2 = BodyLabel("/", self)
+        self.label3 = BodyLabel(str(self.max_number), self)
+        self.label4 = BodyLabel("页", self)
+
+        self.hBoxLayout.setAlignment(Qt.AlignCenter)
+        self.hBoxLayout.addWidget(self.leftButton, 0, Qt.AlignLeft)
+        for btn in self.numberButtons:
+            self.hBoxLayout.addWidget(btn, 0, Qt.AlignLeft)
+        self.hBoxLayout.addWidget(self.rightButton, 0, Qt.AlignLeft)
+        self.hBoxLayout.addWidget(self.label1, 0, Qt.AlignLeft)
+        self.hBoxLayout.addWidget(self.lineEdit, 0, Qt.AlignLeft)
+        self.hBoxLayout.addWidget(self.label2, 0, Qt.AlignLeft)
+        self.hBoxLayout.addWidget(self.label3, 0, Qt.AlignLeft)
+        self.hBoxLayout.addWidget(self.label4, 0, Qt.AlignLeft)
+
+        self.setLayout(self.hBoxLayout)
+
+        if self.max_number <= 0:
+            self.label2.hide()
+            self.label3.hide()
+            self.label4.hide()
+
+        self.setNumber(1, False)
+
+    def _createButtonHandler(self, index):
+        def handler():
+            if index < len(self.numberButtons):
+                text = self.numberButtons[index].text()
+                if text.isdigit():
+                    self.setNumber(int(text))
+
+        return handler
+
+    def setNumber(self, number: int, signal: bool = True):
+        """
+        设置当前页码
+        :param number: 数字
+        :param signal: 是否发送更改信号
+        :return:
+        """
+        if self.number == number:
+            return
+        self.number = number
+        if number <= 0 or number > self.max_number > 0:
+            return
+
+        self.leftButton.setEnabled(number > 1)
+        self.rightButton.setEnabled(self.max_number <= 0 or number < self.max_number)
+
+        if self.max_number <= 0:
+            start = max(1, number - self.max_visible // 2)
+        else:
+            start = max(1, min(int(number - self.max_visible // 2), self.max_number - self.max_visible + 1))
+
+        for i, btn in enumerate(self.numberButtons):
+            btn_num = start + i
+            btn.setText(str(btn_num))
+            btn.setChecked(btn_num == number)
+
+        self.lineEdit.setText(str(number))
+        if signal:
+            self.pageChanged.emit(number)
+
+    def getNumber(self):
+        """
+        获取当前页面数字
+        :return:
+        """
+        return self.number

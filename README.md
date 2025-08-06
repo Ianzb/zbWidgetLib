@@ -29,3 +29,4 @@ zb组件库（zbWidgetLib）是一个PyQt5组件库，提供了一些便捷组�
 2025-08-01：2.1.3：修复进度条判断错误的Bug并完善接口，LoadingCard新增随机进度条支持。 
 2025-08-02：2.2.0.1：新增SaveFilePrimaryPushButton和SaveFilePushButton，删除BigInfoCard的Tag的固定大小，LoadingMessageBox添加默认文本。  
 2025-08-06：2.2.2：setToolTip现在为亚克力样式，修复TabPage类变量错误。  
+2025-08-06：2.3.0：新增PageSpliter，CardGroup支持横向排列。
