@@ -1463,25 +1463,50 @@ class SaveFilePrimaryPushButton(PrimaryPushButton):
 
 
 class PageSpliter(QWidget):
-    pageChanged = pyqtSignal(int)
+    pageChanged = pyqtSignal(int, int, int)
 
-    def __init__(self, parent=None, max_number: int = 10, max_visible: int = 10):
+    def __init__(self, parent=None, max_page: int = 10, max_visible: int = 10, length: int = 10, preset_length: list = None, max_length: int = 100, show_max: bool = True, show_jump_input: bool = True, show_length_input: bool = True):
         """
         分页器组件，通过pageChanged绑定页面修改事件
         :param parent:
-        :param max_number: 最大页码
+        :param max_page: 最大页码
         :param max_visible: 同时显示数量
+        :param length: 每个页面的长度
+        :param preset_length: 预设页面长度
+        :param preset_length: 最大页面长度
+        :param show_max: 是否显示最大页码
+        :param show_jump_input: 是否展示跳转输入框
+        :param show_length_input: 是否展示长度输入框
         """
         super().__init__(parent)
-        self.max_number = max_number
+        if preset_length is None:
+            preset_length = []
+        else:
+            preset_length = [i for i in preset_length if 0 < i <= max_length]
+        if length <= 0:
+            length = 1
+        if length > max_length:
+            length = max_length
+        if length not in preset_length and preset_length:
+            preset_length.append(length)
+        preset_length = sorted(list(set(preset_length)))
+
+        self.max_page = max_page
         self.max_visible = max_visible
-        self.number = 0
+        self.length = length
+        self.preset_length = preset_length
+        self.max_length = max_length
+        self.show_max = show_max
+        self.show_jump_input = show_jump_input
+        self.show_length_input = show_length_input
+
+        self.page = 0
         self._buttons = {}
         self.hBoxLayout = QHBoxLayout(self)
         self.hBoxLayout.setSpacing(8)
 
         self.leftButton = TransparentToolButton(FIF.CARE_LEFT_SOLID, self)
-        self.leftButton.clicked.connect(lambda: self.setNumber(self.number - 1))
+        self.leftButton.clicked.connect(lambda: self.setPage(self.page - 1))
 
         self.numberButtons = []
 
@@ -1492,20 +1517,50 @@ class PageSpliter(QWidget):
             self.hBoxLayout.addWidget(btn, 0, Qt.AlignLeft)
 
         self.rightButton = TransparentToolButton(FIF.CARE_RIGHT_SOLID, self)
-        self.rightButton.clicked.connect(lambda: self.setNumber(self.number + 1))
+        self.rightButton.clicked.connect(lambda: self.setPage(self.page + 1))
 
         self.label1 = BodyLabel("页", self)
-        self.lineEdit = LineEdit(self)
-        self.lineEdit.setMaximumWidth(50)
-        if self.max_number <= 0:
-            self.lineEdit.setValidator(QIntValidator(1, 1000))
+        self.label1.setVisible(self.show_jump_input)
+
+        self.lineEdit1 = LineEdit(self)
+        self.lineEdit1.setMaximumWidth(50)
+        if self.max_page <= 0:
+            self.lineEdit1.setValidator(QIntValidator(1, 1000))
         else:
-            self.lineEdit.setValidator(QIntValidator(1, self.max_number))
-        self.lineEdit.returnPressed.connect(lambda: self.setNumber(int(self.lineEdit.text())))
+            self.lineEdit1.setValidator(QIntValidator(1, self.max_page))
+        self.lineEdit1.returnPressed.connect(lambda: self.setPage(int(self.lineEdit1.text())))
+        self.lineEdit1.setVisible(self.show_jump_input)
 
         self.label2 = BodyLabel("/", self)
-        self.label3 = BodyLabel(str(self.max_number), self)
+        self.label2.setVisible(self.show_max and self.show_jump_input and self.max_page > 0)
+
+        self.label3 = BodyLabel(str(self.max_page), self)
+        self.label3.setVisible(self.show_max and self.max_page > 0)
+
         self.label4 = BodyLabel("页", self)
+        self.label4.setVisible(self.show_max and self.max_page > 0)
+
+        self.lineEdit2 = LineEdit(self)
+        self.lineEdit2.setText(str(self.length))
+        self.lineEdit2.setMaximumWidth(50)
+        if self.max_page <= 0:
+            self.lineEdit2.setValidator(QIntValidator(1, 1000))
+        else:
+            self.lineEdit2.setValidator(QIntValidator(1, self.max_length))
+        self.lineEdit2.returnPressed.connect(lambda: self.setLength(int(self.lineEdit2.text())))
+        self.lineEdit2.setVisible(self.show_length_input and not bool(self.preset_length))
+
+        self.label5 = BodyLabel("/", self)
+        self.label5.setVisible(self.show_length_input and not bool(self.preset_length))
+
+        self.label6 = BodyLabel("页", self)
+        self.label6.setVisible(self.show_length_input and not bool(self.preset_length))
+
+        self.comboBox = AcrylicComboBox(self)
+        self.comboBox.addItems([str(i) + " / 页" for i in self.preset_length])
+        self.comboBox.setCurrentText(str(self.length) + " / 页")
+        self.comboBox.currentTextChanged.connect(lambda text: self.setLength(int(text[:-4] if text else 0)))
+        self.comboBox.setVisible(self.show_length_input and bool(self.preset_length))
 
         self.hBoxLayout.setAlignment(Qt.AlignCenter)
         self.hBoxLayout.addWidget(self.leftButton, 0, Qt.AlignLeft)
@@ -1513,62 +1568,225 @@ class PageSpliter(QWidget):
             self.hBoxLayout.addWidget(btn, 0, Qt.AlignLeft)
         self.hBoxLayout.addWidget(self.rightButton, 0, Qt.AlignLeft)
         self.hBoxLayout.addWidget(self.label1, 0, Qt.AlignLeft)
-        self.hBoxLayout.addWidget(self.lineEdit, 0, Qt.AlignLeft)
+        self.hBoxLayout.addWidget(self.lineEdit1, 0, Qt.AlignLeft)
         self.hBoxLayout.addWidget(self.label2, 0, Qt.AlignLeft)
         self.hBoxLayout.addWidget(self.label3, 0, Qt.AlignLeft)
         self.hBoxLayout.addWidget(self.label4, 0, Qt.AlignLeft)
+        self.hBoxLayout.addSpacing(8)
+        self.hBoxLayout.addWidget(self.lineEdit2, 0, Qt.AlignLeft)
+        self.hBoxLayout.addWidget(self.label5, 0, Qt.AlignLeft)
+        self.hBoxLayout.addWidget(self.label6, 0, Qt.AlignLeft)
+        self.hBoxLayout.addWidget(self.comboBox, 0, Qt.AlignLeft)
 
         self.setLayout(self.hBoxLayout)
 
-        if self.max_number <= 0:
-            self.label2.hide()
-            self.label3.hide()
-            self.label4.hide()
-
-        self.setNumber(1, False)
+        self.setPage(1, False)
 
     def _createButtonHandler(self, index):
         def handler():
             if index < len(self.numberButtons):
                 text = self.numberButtons[index].text()
                 if text.isdigit():
-                    self.setNumber(int(text))
+                    self.setPage(int(text))
 
         return handler
 
-    def setNumber(self, number: int, signal: bool = True):
+    def setPage(self, page: int, signal: bool = True):
         """
         设置当前页码
-        :param number: 数字
+        :param page: 数字
         :param signal: 是否发送更改信号
         :return:
         """
-        if self.number == number:
+        if self.page == page:
             return
-        self.number = number
-        if number <= 0 or number > self.max_number > 0:
+        self.page = page
+        if page <= 0 or page > self.max_page > 0:
             return
 
-        self.leftButton.setEnabled(number > 1)
-        self.rightButton.setEnabled(self.max_number <= 0 or number < self.max_number)
+        self.leftButton.setEnabled(page > 1)
+        self.rightButton.setEnabled(self.max_page <= 0 or page < self.max_page)
 
-        if self.max_number <= 0:
-            start = max(1, number - self.max_visible // 2)
+        if self.max_page <= 0:
+            start = max(1, page - self.max_visible // 2)
         else:
-            start = max(1, min(int(number - self.max_visible // 2), self.max_number - self.max_visible + 1))
+            start = max(1, min(int(page - self.max_visible // 2), self.max_page - self.max_visible + 1))
 
         for i, btn in enumerate(self.numberButtons):
             btn_num = start + i
             btn.setText(str(btn_num))
-            btn.setChecked(btn_num == number)
+            btn.setChecked(btn_num == page)
 
-        self.lineEdit.setText(str(number))
+        self.lineEdit1.setText(str(page))
         if signal:
-            self.pageChanged.emit(number)
+            self.pageChanged.emit(self.page, self.length, self.getNumber())
 
-    def getNumber(self):
+    def getPage(self):
         """
         获取当前页面数字
         :return:
         """
-        return self.number
+        return self.page
+
+    def getNumber(self):
+        """
+        获取当前页面第一个的编号（0开始）
+        :return:
+        """
+        return (self.page - 1) * self.length
+
+    def getLength(self):
+        """
+        获取页面长度
+        :return:
+        """
+        return self.length
+
+    def setLength(self, length: int, signal: bool = True):
+        """
+        设置页面长度
+        :param length: 长度
+        :param signal: 是否发送信号
+        """
+        if length <= 0:
+            return
+        if length > self.max_length:
+            return
+        self.length = length
+        if self.length not in self.preset_length and self.preset_length:
+            self.addPresetLength(self.length)
+        if signal:
+            self.pageChanged.emit(self.page, self.length, self.getNumber())
+
+    def setMaxPage(self, page: int):
+        """
+        设置最大页面
+        :param page: 页面
+        """
+        self.max_page = page
+        if self.max_page <= 0:
+            self.lineEdit1.setValidator(QIntValidator(1, 1000))
+        else:
+            self.lineEdit1.setValidator(QIntValidator(1, self.max_page))
+        self.label2.setVisible(self.show_max and self.show_jump_input and self.max_page > 0)
+        self.label3.setText(str(self.max_page))
+        self.label3.setVisible(self.show_max and self.max_page > 0)
+        self.label4.setVisible(self.show_max and self.max_page > 0)
+
+    def getMaxPage(self):
+        """
+        获取最大页面
+        :return: 页面数
+        """
+        return self.max_page
+
+    def setShowMax(self, show_max: bool):
+        """
+        设置是否展示最大页码
+        :param show_max:
+        """
+        self.show_max = show_max
+        self.label2.setVisible(self.show_max and self.show_jump_input and self.max_page > 0)
+        self.label3.setVisible(self.show_max and self.max_page > 0)
+        self.label4.setVisible(self.show_max and self.max_page > 0)
+
+    def getShowMax(self):
+        """
+        获取是否展示最大页码
+        :return:
+        """
+        return self.show_max
+
+    def setShowJumpInput(self, show_jump_input: bool):
+        """
+        设置是否展示跳转输入框
+        :param show_jump_input:
+        """
+        self.show_jump_input = show_jump_input
+        self.label1.setVisible(self.show_jump_input)
+        self.lineEdit1.setVisible(self.show_jump_input)
+        self.label2.setVisible(self.show_max and self.show_jump_input and self.max_page > 0)
+
+    def getShowJumpInput(self):
+        """
+        获取是否展示跳转输入框
+        :return:
+        """
+        return self.show_jump_input
+
+    def setPresetLength(self, preset_length: list):
+        """
+        设置预设长度列表
+        :param preset_length:
+        """
+        if preset_length is None:
+            preset_length = []
+        else:
+            preset_length = [i for i in preset_length if 0 < i <= self.max_length]
+        if self.length not in preset_length and preset_length:
+            preset_length.append(self.length)
+        preset_length = sorted(list(set(preset_length)))
+        self.preset_length = preset_length
+
+        self.lineEdit2.setVisible(self.show_length_input and not bool(self.preset_length))
+        self.label5.setVisible(self.show_length_input and not bool(self.preset_length))
+        self.label6.setVisible(self.show_length_input and not bool(self.preset_length))
+        self.comboBox.blockSignals(True)
+        while self.comboBox.items:
+            self.comboBox.removeItem(0)
+        self.comboBox.addItems([str(i) + " / 页" for i in self.preset_length])
+        self.comboBox.setCurrentText(str(self.length) + " / 页")
+        self.comboBox.blockSignals(False)
+        self.comboBox.setVisible(self.show_length_input and bool(self.preset_length))
+
+    def addPresetLength(self, preset_length: int | list):
+        """
+        添加预设长度列表
+        :param preset_length: 添加项
+        """
+        if isinstance(preset_length, int):
+            self.setPresetLength(self.preset_length + [preset_length])
+        elif isinstance(preset_length, list):
+            self.setPresetLength(self.preset_length + preset_length)
+
+    def removePresetLength(self, preset_length: int | list):
+        """
+        移除预设长度列表
+        :param preset_length: 移除项
+        """
+        if isinstance(preset_length, int):
+            preset_length = [preset_length]
+        old = deepcopy(self.preset_length)
+        for i in preset_length:
+            old.remove(i)
+        self.setPresetLength(old)
+
+    def getPresetLength(self):
+        """
+        设置预设长度列表
+        :return:
+        """
+        return self.preset_length
+
+    def setMaxLength(self, max_length: int):
+        """
+        设置最大长度
+        :param max_length:
+        """
+        self.max_length = max_length
+
+        if self.length > self.max_length:
+            self.setLength(self.length)
+        if self.preset_length:
+            self.setPresetLength(self.preset_length)
+        if self.max_page <= 0:
+            self.lineEdit2.setValidator(QIntValidator(1, 1000))
+        else:
+            self.lineEdit2.setValidator(QIntValidator(1, self.max_length))
+
+    def getMaxLength(self):
+        """
+        获取最大长度
+        :return:
+        """
+        return self.max_length
