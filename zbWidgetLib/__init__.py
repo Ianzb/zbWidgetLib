@@ -1683,6 +1683,8 @@ class PageSpliter(QWidget):
             else:
                 # 对于无效页码，隐藏按钮
                 btn.setVisible(False)
+        self.leftButton.setEnabled(self.page > 1)
+        self.rightButton.setEnabled(self.max_page <= 0 or self.page < self.max_page)
 
     def setMaxVisible(self, max_visible: int):
         """

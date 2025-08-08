@@ -31,3 +31,4 @@ zb组件库（zbWidgetLib）是一个PyQt5组件库，提供了一些便捷组�
 2025-08-06：2.2.2：setToolTip现在为亚克力样式，修复TabPage类变量错误。  
 2025-08-06：2.3.0：新增PageSpliter，CardGroup支持横向排列。  
 2025-08-07：2.3.1.1：PageSpliter新增7个参数和相关接口，并大规模优化代码。  
+2025-08-09：2.3.2：修复修改total_count时翻页按钮响应不及时的Bug。  
