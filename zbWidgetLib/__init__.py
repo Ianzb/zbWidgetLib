@@ -471,9 +471,9 @@ class FlowGrayCard(QWidget):
         self.vBoxLayout.addWidget(self.titleLabel, 0, Qt.AlignTop)
         self.vBoxLayout.addWidget(self.card, 0, Qt.AlignTop)
 
-        self.hBoxLayout = FlowLayout(self.card)
-        self.hBoxLayout.setSpacing(4)
-        self.hBoxLayout.setContentsMargins(12, 12, 12, 12)
+        self.flowLayout = FlowLayout(self.card)
+        self.flowLayout.setSpacing(4)
+        self.flowLayout.setContentsMargins(12, 12, 12, 12)
 
         self.setTheme()
         qconfig.themeChanged.connect(self.setTheme)
@@ -491,7 +491,7 @@ class FlowGrayCard(QWidget):
         :param spacing: 间隔
         :param alignment: 对齐方式
         """
-        self.hBoxLayout.addWidget(widget)
+        self.flowLayout.addWidget(widget)
 
     def insertWidget(self, index: int, widget):
         """
@@ -500,7 +500,7 @@ class FlowGrayCard(QWidget):
         :param widget: 组件
         :param alignment: 对齐方式
         """
-        self.hBoxLayout.insertWidget(index, widget)
+        self.flowLayout.insertWidget(index, widget)
 
 
 class BigInfoCard(CardWidget):
@@ -2078,3 +2078,34 @@ class PageSpliter(QWidget):
         :return: 项目总数
         """
         return self.total_count
+
+
+class ComboBoxWithLabel(QWidget):
+    @functools.singledispatchmethod
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
+
+        self.hBoxLayout = QHBoxLayout(self)
+        self.hBoxLayout.setSpacing(4)
+        self.hBoxLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.label = BodyLabel("", self)
+        self.comboBox = AcrylicComboBox(self)
+
+        self.hBoxLayout.addWidget(self.label, 0, Qt.AlignCenter)
+        self.hBoxLayout.addWidget(self.comboBox)
+
+    @__init__.register
+    def _(self, text: str, parent: QWidget = None):
+        self.__init__(parent)
+        self.label.setText(text)
+
+    def __getattr__(self, name: str):
+        """委托属性访问到label或comboBox"""
+        try:
+            return getattr(self.comboBox, name)
+        except AttributeError:
+            try:
+                return getattr(self.label, name)
+            except AttributeError:
+                raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
