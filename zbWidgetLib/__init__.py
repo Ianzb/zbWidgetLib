@@ -1415,6 +1415,8 @@ class SaveFilePushButton(PushButton):
         :param path: 默认路径
         """
         self.default_path = path
+        if not zb.existPath(self.default_path):
+            zb.createDir(zb.getFileDir(self.default_path))
 
     def getSuffix(self):
         """
@@ -1491,6 +1493,8 @@ class SaveFilePrimaryPushButton(PrimaryPushButton):
         :param path: 默认路径
         """
         self.default_path = path
+        if not zb.existPath(self.default_path):
+            zb.createDir(zb.getFileDir(self.default_path))
 
     def getSuffix(self):
         """
