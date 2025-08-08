@@ -1523,7 +1523,7 @@ class PageSpliter(QWidget):
     pageChanged = pyqtSignal(int, int, int)  # 信号：当前页码, 页面长度, 起始编号(0开始)
 
     def __init__(self, parent=None, max_page: int = 10, max_visible: int = 10, length: int = 10,
-                 preset_length: list = None, max_length: int = 100, total_count: int = 0,
+                 preset_length: list = None, max_length: int = 100, total_count: int = -1,
                  show_max: bool = True, show_jump_input: bool = True, show_length_input: bool = True):
         """
         分页器组件，通过pageChanged绑定页面修改事件
@@ -1534,7 +1534,7 @@ class PageSpliter(QWidget):
         :param length: 每个页面的长度（项目数量）
         :param preset_length: 预设的页面长度选项列表
         :param max_length: 允许的最大页面长度
-        :param total_count: 项目总数（用于自动计算最大页码）
+        :param total_count: 项目总数（-1表示无限制，0表示只有1页）
         :param show_max: 是否显示最大页码
         :param show_jump_input: 是否显示页面跳转输入框
         :param show_length_input: 是否显示页面长度设置控件
@@ -1567,8 +1567,10 @@ class PageSpliter(QWidget):
         # 根据总数计算最大页码
         if total_count > 0:
             max_page = max(1, (total_count - 1) // length + 1)
-        else:
-            total_count = 0
+        elif total_count == 0:
+            max_page = 1  # 总数为0时强制为1页
+        else:  # total_count < 0 表示无限制
+            total_count = -1  # 确保为负值
 
         # 存储初始参数
         self.max_visible = max_visible
@@ -1594,6 +1596,7 @@ class PageSpliter(QWidget):
         """创建所有UI组件"""
         # 创建布局
         self.hBoxLayout = QHBoxLayout(self)
+        self.hBoxLayout.setContentsMargins(0, 0, 0, 0)
         self.hBoxLayout.setSpacing(8)
 
         # 创建左右翻页按钮
@@ -1853,7 +1856,13 @@ class PageSpliter(QWidget):
 
         # 如果有总数，重新计算最大页码
         if self.total_count > 0:
-            self.setMaxPage(max(1, (self.total_count - 1) // length + 1), False)
+            max_page = max(1, (self.total_count - 1) // length + 1)
+        elif self.total_count == 0:
+            max_page = 1  # 总数为0时强制为1页
+        else:  # total_count < 0 表示无限制
+            max_page = 0  # 无限制
+
+        self.setMaxPage(max_page, False)
 
         # 更新UI
         self.lineEdit2.setText(str(length))
@@ -2059,23 +2068,30 @@ class PageSpliter(QWidget):
         """
         return self.max_length
 
-    def setTotalCount(self, total_count: int):
+    def setTotalCount(self, total_count: int, signal: bool = True):
         """
         设置项目总数（自动计算最大页码）
 
-        :param total_count: 项目总数
+        :param total_count: 项目总数（-1表示无限制，0表示只有1页）
+        :param signal: 是否发送信号
         """
         self.total_count = total_count
-        if self.total_count > 0:
-            self.setMaxPage(max(1, (self.total_count - 1) // self.length + 1))
-        else:
-            self.total_count = 0
+
+        # 根据新的总数计算最大页码
+        if total_count > 0:
+            max_page = max(1, (total_count - 1) // self.length + 1)
+        elif total_count == 0:
+            max_page = 1  # 总数为0时强制为1页
+        else:  # total_count < 0 表示无限制
+            max_page = 0  # 无限制
+
+        self.setMaxPage(max_page, signal)
 
     def getTotalCount(self):
         """
         获取项目总数
 
-        :return: 项目总数
+        :return: 项目总数（-1表示无限制）
         """
         return self.total_count
 
