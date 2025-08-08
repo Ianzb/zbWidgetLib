@@ -414,7 +414,7 @@ class GrayCard(QWidget):
         self.hBoxLayout = QHBoxLayout(self.card)
         self.hBoxLayout.setAlignment(alignment)
         self.hBoxLayout.setSizeConstraint(QHBoxLayout.SizeConstraint.SetMinimumSize)
-        self.hBoxLayout.setSpacing(0)
+        self.hBoxLayout.setSpacing(4)
         self.hBoxLayout.setContentsMargins(12, 12, 12, 12)
 
         self.setTheme()
@@ -444,6 +444,63 @@ class GrayCard(QWidget):
         :param alignment: 对齐方式
         """
         self.hBoxLayout.insertWidget(index, widget, 0, alignment)
+
+
+class FlowGrayCard(QWidget):
+
+    def __init__(self, title: str = None, parent=None):
+        """
+        流式布局灰色背景组件卡片
+        :param title: 标题
+        """
+        super().__init__(parent=parent)
+
+        self.titleLabel = StrongBodyLabel(self)
+        if title:
+            self.titleLabel.setText(title)
+        else:
+            self.titleLabel.hide()
+
+        self.card = QFrame(self)
+
+        self.vBoxLayout = QVBoxLayout(self)
+        self.vBoxLayout.setAlignment(Qt.AlignTop)
+        self.vBoxLayout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetMinimumSize)
+        self.vBoxLayout.setSpacing(12)
+        self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
+        self.vBoxLayout.addWidget(self.titleLabel, 0, Qt.AlignTop)
+        self.vBoxLayout.addWidget(self.card, 0, Qt.AlignTop)
+
+        self.hBoxLayout = FlowLayout(self.card)
+        self.hBoxLayout.setSpacing(4)
+        self.hBoxLayout.setContentsMargins(12, 12, 12, 12)
+
+        self.setTheme()
+        qconfig.themeChanged.connect(self.setTheme)
+
+    def setTheme(self):
+        if isDarkTheme():
+            self.card.setStyleSheet("FlowGrayCard > QFrame {background-color: rgba(25,25,25,0.5); border:1px solid rgba(20,20,20,0.15); border-radius: 10px}")
+        else:
+            self.card.setStyleSheet("FlowGrayCard > QFrame {background-color: rgba(175,175,175,0.1); border:1px solid rgba(150,150,150,0.15); border-radius: 10px}")
+
+    def addWidget(self, widget):
+        """
+        添加组件
+        :param widget: 组件
+        :param spacing: 间隔
+        :param alignment: 对齐方式
+        """
+        self.hBoxLayout.addWidget(widget)
+
+    def insertWidget(self, index: int, widget):
+        """
+        插入组件
+        :param index: 序号
+        :param widget: 组件
+        :param alignment: 对齐方式
+        """
+        self.hBoxLayout.insertWidget(index, widget)
 
 
 class BigInfoCard(CardWidget):
