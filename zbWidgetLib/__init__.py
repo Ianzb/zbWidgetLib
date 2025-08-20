@@ -2132,7 +2132,7 @@ class ScrollMessageBoxBase(MessageBoxBase):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.scrollArea = zbw.BasicTab(self)
+        self.scrollArea = BasicTab(self)
         self.scrollArea.vBoxLayout.setContentsMargins(0, 0, 0, 0)
 
         self.scrollLayout = self.scrollArea.vBoxLayout
