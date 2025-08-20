@@ -33,3 +33,4 @@ zb组件库（zbWidgetLib）是一个PyQt5组件库，提供了一些便捷组�
 2025-08-07：2.3.1.1：PageSpliter新增7个参数和相关接口，并大规模优化代码。  
 2025-08-08：2.3.2：修复修改total_count时翻页按钮响应不及时的Bug。  
 2025-08-08：2.4.0.3：新增FlowGrayCard，优化GrayCard间距，新增ComboBoxWithLabel，完善PageSpliter信号阻止机制，完善total_count小于等于0时的逻辑，SaveFilePushButton新增自动创建目录。  
+2025-08-20：2.4.1：新增setSelectable函数，并尝试替换原函数，新增ScrollMessageBoxBase和ScrollMessageBox。  

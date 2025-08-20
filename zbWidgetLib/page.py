@@ -1,4 +1,4 @@
-from .base import *
+from .func import *
 
 
 class BetterScrollArea(SmoothScrollArea):

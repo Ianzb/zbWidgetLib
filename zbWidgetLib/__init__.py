@@ -1,12 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor
 
 from .base import *
+from .func import *
 from .page import *
-
-
-def setToolTip(widget, text: str):
-    widget.setToolTip(text)
-    widget.installEventFilter(AcrylicToolTipFilter(widget, 1000))
 
 
 class StatisticsWidget(QWidget):
@@ -22,8 +18,8 @@ class StatisticsWidget(QWidget):
         self.valueLabel = BodyLabel(value, self)
 
         if select_text:
-            self.titleLabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            self.valueLabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            self.titleLabel.setSelectable()
+            self.valueLabel.setSelectable()
 
         self.vBoxLayout = QVBoxLayout(self)
         self.vBoxLayout.setContentsMargins(16, 0, 16, 0)
@@ -172,7 +168,8 @@ class CopyTextButton(ToolButton):
         :param data_type: 复制文本的提示信息，可以提示复制文本的内容类型
         :param parent: 父组件
         """
-        super().__init__(FIF.COPY, parent)
+        super().__init__(parent=parent)
+        self.setIcon(FIF.COPY)
         self._text = text
         self._data_type = data_type
         self.clicked.connect(self.copyButtonClicked)
@@ -193,7 +190,7 @@ class CopyTextButton(ToolButton):
         self._text = text
         self._data_type = data_type
 
-        setToolTip(self, f"点击复制{self._data_type}信息！")
+        self.setNewToolTip(f"点击复制{self._data_type}信息！")
 
     def getText(self):
         """
@@ -532,8 +529,8 @@ class BigInfoCard(CardWidget):
         self.infoLabel.setWordWrap(True)
 
         if select_text:
-            self.titleLabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            self.infoLabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            self.titleLabel.setSelectable()
+            self.infoLabel.setSelectable()
 
         self.hBoxLayout1 = QHBoxLayout()
         self.hBoxLayout1.setContentsMargins(0, 0, 0, 0)
@@ -866,9 +863,9 @@ class SmallInfoCard(CardWidget):
         self.contentLabel2.setAlignment(Qt.AlignRight)
 
         if select_text:
-            self.titleLabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            self.contentLabel1.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            self.contentLabel2.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            self.titleLabel.setSelectable()
+            self.contentLabel1.setSelectable()
+            self.contentLabel2.setSelectable()
 
         self.mainButton = PushButton("", self)
 
@@ -2129,3 +2126,26 @@ class ComboBoxWithLabel(QWidget):
                 return getattr(self.label, name)
             except AttributeError:
                 raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+
+class ScrollMessageBoxBase(MessageBoxBase):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.scrollArea = zbw.BasicTab(self)
+        self.scrollArea.vBoxLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.scrollLayout = self.scrollArea.vBoxLayout
+
+        self.viewLayout.addWidget(self.scrollArea, 0)
+
+
+class ScrollMessageBox(ScrollMessageBoxBase):
+    def __init__(self, title: str, content: str, parent=None):
+        super().__init__(parent=parent)
+        self.titleLabel = TitleLabel(title, self)
+        self.contentLabel = BodyLabel(content, self)
+        self.contentLabel.setWordWrap(True)
+
+        self.viewLayout.insertWidget(0,self.titleLabel)
+        self.scrollLayout.addWidget(self.contentLabel)
