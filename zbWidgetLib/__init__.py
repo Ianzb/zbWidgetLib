@@ -1363,6 +1363,28 @@ class LoadingMessageBox(MaskDialogBase):
         opacityAni.finished.connect(self.deleteLater)
         opacityAni.start()
 
+    def showEvent(self, e):
+        self.opacity_effect = QGraphicsOpacityEffect(self)
+        self.setGraphicsEffect(self.opacity_effect)
+        self.opacity_ani = QPropertyAnimation(self.opacity_effect, b'opacity', self)
+        self.opacity_ani.setStartValue(0)
+        self.opacity_ani.setEndValue(1)
+        self.opacity_ani.setDuration(200)
+        self.opacity_ani.setEasingCurve(QEasingCurve.InSine)
+        self.opacity_ani.start()
+        super(QDialog, self).showEvent(e)
+
+    def closeEvent(self, e):
+        if hasattr(self, 'opacity_ani') and self.opacity_ani.state() == QPropertyAnimation.Running:
+            self.opacity_ani.stop()
+            self.setGraphicsEffect(None)
+            try:
+                self.opacity_ani.deleteLater()
+                self.opacity_effect.deleteLater()
+            except:
+                pass
+        super().closeEvent(e)
+
 
 class SaveFilePushButton(PushButton):
     fileChoosedSignal = pyqtSignal(str)
@@ -2127,6 +2149,7 @@ class ComboBoxWithLabel(QWidget):
             except AttributeError:
                 raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
+
 class ScrollMessageBoxBase(MessageBoxBase):
 
     def __init__(self, parent=None):
@@ -2147,5 +2170,5 @@ class ScrollMessageBox(ScrollMessageBoxBase):
         self.contentLabel = BodyLabel(content, self)
         self.contentLabel.setWordWrap(True)
 
-        self.viewLayout.insertWidget(0,self.titleLabel)
+        self.viewLayout.insertWidget(0, self.titleLabel)
         self.scrollLayout.addWidget(self.contentLabel)
