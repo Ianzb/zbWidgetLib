@@ -210,7 +210,8 @@ class BasicTabPage(BasicPage):
 
     def onCurrentIndexChanged(self, index: int):
         widget = self.stackedWidget.widget(index)
-        self.pivot.setCurrentItem(widget.objectName())
+        if widget:
+            self.pivot.setCurrentItem(widget.objectName())
 
 
 class BasicTab(BasicPage):
