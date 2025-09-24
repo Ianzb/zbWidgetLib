@@ -2177,7 +2177,7 @@ class ScrollMessageBox(ScrollMessageBoxBase):
 class ScrollDialog(Dialog):
     def __init__(self, title: str, content: str, parent=None):
         super().__init__(title, content, parent)
-        self.scrollArea = self.BasicTab(self)
+        self.scrollArea = BasicTab(self)
         self.scrollArea.vBoxLayout.setContentsMargins(0, 0, 0, 0)
 
         self.scrollLayout = self.scrollArea.vBoxLayout
