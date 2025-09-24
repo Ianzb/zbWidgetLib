@@ -1,6 +1,6 @@
 [project]
 name = "zbWidgetLib"
-version = "2.5.3"
+version = "2.6.0"
 description = "zb组件库"
 requires-python = ">=3.12"
 dependencies = [
