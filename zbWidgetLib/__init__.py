@@ -2192,11 +2192,9 @@ class ScrollDialog(Dialog):
 
     def _adjustSize(self):
         content_height = self.contentLabel.sizeHint().height()
-        padding = 12
         MAX_HEIGHT = self.maximumHeight()
-        target_height = content_height + padding
         # 最小高度为内容高度（不超过MAX），最大高度固定为MAX
-        self.scrollArea.setMinimumHeight(min(target_height, MAX_HEIGHT))
+        self.scrollArea.setMinimumHeight(min(content_height, MAX_HEIGHT))
         self.scrollArea.setMaximumHeight(MAX_HEIGHT)
         # 让scrollArea在垂直方向为固定高度（由上面控制），水平方向可扩展
         self.scrollArea.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

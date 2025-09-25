@@ -38,3 +38,4 @@ zb组件库（zbWidgetLib）是一个PyQt5组件库，提供了一些便捷组�
 2025-09-14：2.5.2：修复删除BasicTabPage最后一个页面时崩溃的Bug。  
 2025-09-23：2.5.3：添加pyi文件。  
 2025-09-24：2.6.0.1：新增ScrollDialog。  
+2025-09-25：2.6.1：优化ScrollDialog高度判定。  
