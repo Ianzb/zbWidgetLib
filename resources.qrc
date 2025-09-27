@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/">
+    <file>zbWidgetLib/icons/FluentAppsList_black.svg</file>
+    <file>zbWidgetLib/icons/FluentAppsList_white.svg</file>
+  </qresource>
+</RCC>

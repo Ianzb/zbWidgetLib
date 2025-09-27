@@ -5,6 +5,12 @@ from .func import *
 from .icon import *
 from .page import *
 
+# 尝试导入编译后的 Qt 资源（resources_rc.py），使 :/zbWidgetLib/icons/... 可用
+try:
+    from . import resources_rc  # noqa: F401
+except Exception:
+    pass
+
 
 class StatisticsWidget(QWidget):
 

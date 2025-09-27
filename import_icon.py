@@ -2,6 +2,9 @@ from lxml import etree
 import os
 import glob
 import re
+import sys
+import shutil
+import subprocess
 
 
 def sanitize_member(name):
@@ -169,5 +172,93 @@ if os.path.isfile(icon_py_path):
             print('没有需要添加的枚举成员。')
 else:
     print(f"未找到文件: {icon_py_path}，请检查路径。")
+
+# 自动生成 resources.qrc 并编译为 zbWidgetLib/resources_rc.py
+def generate_qrc_and_compile(icons_dir: str, qrc_path: str, out_py: str):
+    # 收集所有 svg 相对路径（写入 qrc 时使用正斜杠）
+    files = []
+    for root, _, filenames in os.walk(icons_dir):
+        for fn in filenames:
+            if fn.lower().endswith('.svg'):
+                absf = os.path.join(root, fn)
+                # 资源中以包相对路径写入：zbWidgetLib/icons/.../file.svg
+                rel = os.path.relpath(absf, start=os.path.abspath('.'))
+                rel = rel.replace('\\', '/')
+                files.append(rel)
+    if not files:
+        print('未找到任何 svg 用于生成 resources.qrc，跳过资源生成。')
+        return
+
+    # 写入 qrc 文件
+    qrc_body = ['<RCC>', '  <qresource prefix="/">']
+    for f in sorted(files):
+        qrc_body.append(f'    <file>{f}</file>')
+    qrc_body.append('  </qresource>')
+    qrc_body.append('</RCC>')
+    with open(qrc_path, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(qrc_body))
+    print(f'已生成 QRC: {qrc_path} （包含 {len(files)} 个 svg）')
+
+    # 尝试编译 qrc 为 python 资源文件
+    # 优先使用 python -m PyQt5.pyrcc_main，再尝试 pyrcc5/pyrcc6，可选 PySide2
+    cmds_tried = []
+    success = False
+    errors = []
+
+    # 方法1：python -m PyQt5.pyrcc_main
+    try:
+        cmd = [sys.executable, '-m', 'PyQt5.pyrcc_main', '-o', out_py, qrc_path]
+        cmds_tried.append(' '.join(cmd))
+        subprocess.run(cmd, check=True)
+        success = True
+        print(f'使用 PyQt5.pyrcc_main 编译成功：{out_py}')
+    except Exception as e:
+        errors.append(('PyQt5.pyrcc_main', str(e)))
+
+    # 方法2：pyrcc5 / pyrcc6 可执行文件
+    if not success:
+        for exe in ('pyrcc5', 'pyrcc6'):
+            path = shutil.which(exe)
+            if path:
+                try:
+                    cmd = [path, '-o', out_py, qrc_path]
+                    cmds_tried.append(' '.join(cmd))
+                    subprocess.run(cmd, check=True)
+                    success = True
+                    print(f'使用 {exe} 编译成功：{out_py}')
+                    break
+                except Exception as e:
+                    errors.append((exe, str(e)))
+
+    # 方法3：PySide2 rcc via module
+    if not success:
+        try:
+            cmd = [sys.executable, '-m', 'PySide2.scripts.rcc', '-o', out_py, qrc_path]
+            cmds_tried.append(' '.join(cmd))
+            subprocess.run(cmd, check=True)
+            success = True
+            print(f'使用 PySide2 rcc 编译成功：{out_py}')
+        except Exception as e:
+            errors.append(('PySide2.rcc', str(e)))
+
+    if not success:
+        print('尝试的编译命令：')
+        for c in cmds_tried:
+            print('  ', c)
+        print('编译均失败，错误信息示例：')
+        for tag, msg in errors[:5]:
+            print(f'  {tag}: {msg}')
+        print('请确保已安装 PyQt5 或 pyrcc5/pyrcc6，或者在运行环境中可用。')
+
+
+# 生成并编译资源文件（如果 icons 目录存在）
+icons_folder = os.path.join('.', 'zbWidgetLib', 'icons')
+qrc_file = os.path.join('.', 'resources.qrc')
+resources_py = os.path.join('.', 'zbWidgetLib', 'resources_rc.py')
+if os.path.isdir(icons_folder):
+    try:
+        generate_qrc_and_compile(icons_folder, qrc_file, resources_py)
+    except Exception as e:
+        print('生成或编译资源时出错：', e)
 
 print('完成。')
