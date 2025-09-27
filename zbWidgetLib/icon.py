@@ -2,8 +2,8 @@ from .base import *
 
 
 class ZBF(FluentIconBase, Enum):
-    FluentAppsList = "FluentAppsList"
-
+    apps_list_filled = "apps_list_filled"
+    apps_list = "apps_list"
 
 
     def path(self, theme=Theme.AUTO):

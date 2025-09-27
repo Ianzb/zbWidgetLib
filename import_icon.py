@@ -5,12 +5,16 @@ import re
 import sys
 import shutil
 import subprocess
+import keyword
 
 
 def sanitize_member(name):
     # 保证为有效的 Python 标识符
     n = re.sub(r'[^0-9a-zA-Z_]', '_', name)
     if re.match(r'^[0-9]', n):
+        n = '_' + n
+    # 如果与 Python 关键字冲突，前面加下划线（仅用于枚举类变量名）
+    if keyword.iskeyword(n):
         n = '_' + n
     return n
 
@@ -43,10 +47,14 @@ def find_svg_files(inputs):
     return files
 
 
-svg_input = input("请输入图标路径、文件夹或多个路径（用逗号分隔，支持通配符）：").strip('"')
-if not svg_input:
-    print("未输入路径，退出。")
-    exit(1)
+if len(sys.argv) > 1:
+    # 支持通过命令行参数传入路径（多个参数将被视为多个路径）
+    svg_input = ' '.join(sys.argv[1:])
+else:
+    svg_input = input("请输入图标路径、文件夹或多个路径（用逗号分隔，支持通配符）：").strip('"')
+    if not svg_input:
+        print("未输入路径，退出。")
+        exit(1)
 
 parts = [p.strip() for p in svg_input.split(',') if p.strip()]
 svg_files = find_svg_files(parts)
@@ -60,16 +68,42 @@ os.makedirs(icons_dir, exist_ok=True)
 # 将要新增到 enum 的条目集合
 new_members = []
 
+
+def normalize_icon_name(name: str) -> str:
+    """
+    规范化图标文件基名：
+    - 移除开头的 ic_fluent_ 或 ic_ 前缀
+    - 移除所有纯数字部分（如 24、16 等）
+    - 移除 regular（大小写不敏感）
+    - 保留 filled（并作为独立词）
+    - 其他字母序列保留，统一为小写并以下划线连接
+    例如：ic_fluent_accessibility_error_24_regular -> accessibility_error
+             ic_fluent_accessibility_error_24_filled  -> accessibility_error_filled
+    """
+    # 去除常见前缀
+    name = re.sub(r'^(ic_fluent_|ic_)', '', name, flags=re.I)
+    parts = re.findall(r'[A-Za-z]+|\d+', name)
+    out = []
+    for p in parts:
+        if p.isdigit():
+            continue
+        pl = p.lower()
+        if pl == 'regular':
+            continue
+        if pl == 'filled':
+            out.append('filled')
+            continue
+        out.append(pl)
+    if not out:
+        return name
+    return '_'.join(out)
+
+
 for svg_file in svg_files:
     print(f"处理: {svg_file}")
     base_full = os.path.splitext(os.path.basename(svg_file))[0]
-    # 支持移除末尾的数字+Regular（例如 24Regular、16Regular 等，不区分大小写）
-    def remove_size_suffix(name):
-        # 移除结尾的尺寸+Regular
-        n = re.sub(r'\d+Regular$', '', name, flags=re.I)
-        return n
-
-    member_raw = remove_size_suffix(base_full)
+    # 规范化名称：移除数字与 regular，保留 filled
+    member_raw = normalize_icon_name(base_full)
     if not member_raw:
         member_raw = base_full
     member_name = sanitize_member(member_raw)
