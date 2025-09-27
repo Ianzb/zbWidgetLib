@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from .base import *
 from .func import *
+from .icon import *
 from .page import *
 
 
