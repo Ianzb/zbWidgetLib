@@ -1378,6 +1378,7 @@ class LoadingMessageBox(MaskDialogBase):
         self.opacity_ani.setEndValue(1)
         self.opacity_ani.setDuration(200)
         self.opacity_ani.setEasingCurve(QEasingCurve.InSine)
+        self.opacity_ani.finished.connect(lambda: self.setGraphicsEffect(None))
         self.opacity_ani.start()
         super(QDialog, self).showEvent(e)
 
