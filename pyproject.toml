@@ -1,11 +1,11 @@
 [project]
 name = "zbWidgetLib"
-version = "2.7.1"
+version = "2.7.2"
 description = "zb组件库"
 requires-python = ">=3.12"
 dependencies = [
     "zbToolLib>=2.0.4",
-    "PyQt-Fluent-Widgets[full]>=1.8.7",
+    "PyQt-Fluent-Widgets[full]>=1.9.0",
     "QtPy>=2.4.3"
 ]
 authors = [

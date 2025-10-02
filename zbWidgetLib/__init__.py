@@ -1,5 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 
+from qfluentwidgets.common.icon import toQIcon
+
 from .base import *
 from .func import *
 from .icon import *
@@ -88,15 +90,18 @@ class Image(QLabel):
         self.setFixedSize(48, 48)
         self.setScaledContents(True)
 
-    def setImg(self, path: str):
+    def setImg(self, img: str | FluentIconBase):
         """
         设置图片
-        :param path: 路径
+        :param img: 路径
         :param url: 链接
         :param thread_pool: 下载线程池
         """
         self.loading = False
-        self.setPixmap(QPixmap(path))
+        if isinstance(img, str):
+            self.setPixmap(QPixmap(img))
+        elif isinstance(img, FluentIconBase):
+            self.setPixmap(toQIcon(img).pixmap(QSize(100, 100)))
 
 
 class WebImage(QLabel):
@@ -114,43 +119,46 @@ class WebImage(QLabel):
         self.downloadFinishedSignal.connect(self.downloadFinished)
 
     @__init__.register
-    def _(self, path: str, url: str = None, parent=None, thread_pool: ThreadPoolExecutor = None):
+    def _(self, img: str | FluentIconBase, url: str = None, parent=None, thread_pool: ThreadPoolExecutor = None):
         """
         图片组件（可实时下载）
-        :param path: 路径
+        :param img: 路径
         :param url: 链接
         :param parent:
         :param thread_pool: 线程池
         """
         self.__init__(parent)
-        if path:
-            self.setImg(path, url, thread_pool)
+        if img:
+            self.setImg(img, url, thread_pool)
 
     @__init__.register
-    def _(self, path: str, parent=None):
+    def _(self, img: str | FluentIconBase, parent=None):
         """
-        :param path: 路径
+        :param img: 路径
         """
         self.__init__(parent)
-        if path:
-            self.setImg(path)
+        if img:
+            self.setImg(img)
 
-    def setImg(self, path: str, url: str = None, thread_pool: ThreadPoolExecutor = None):
+    def setImg(self, img: str | FluentIconBase, url: str = None, thread_pool: ThreadPoolExecutor = None):
         """
         设置图片
-        :param path: 路径
+        :param img: 路径
         :param url: 链接
         :param thread_pool: 下载线程池
         """
         if url:
             self.loading = True
-            self.path = path
+            self.path = img
             self.url = url
 
             thread_pool.submit(self.download)
         else:
             self.loading = False
-            self.setPixmap(QPixmap(path))
+            if isinstance(img, str):
+                self.setPixmap(QPixmap(img))
+            elif isinstance(img, FluentIconBase):
+                self.setPixmap(toQIcon(img).pixmap(QSize(100, 100)))
 
     def downloadFinished(self, msg):
         if not self.loading:
