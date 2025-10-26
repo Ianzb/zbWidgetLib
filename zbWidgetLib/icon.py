@@ -1,10 +1,18 @@
 from .base import *
 
+from aenum import Enum, extend_enum
 
 class ZBF(FluentIconBase, Enum):
-    apps_list_filled = "apps_list_filled"
-    apps_list = "apps_list"
-
-
     def path(self, theme=Theme.AUTO):
-        return f':/zbWidgetLib/icons/{self.value}_{getIconColor(theme)}.svg'
+        return zb.joinPath(ZBF._path, f"{self.value}_{getIconColor(theme)}.svg")
+
+    @classmethod
+    def setPath(cls, path):
+        cls._path = path
+
+    @classmethod
+    def add(cls, name):
+        try:
+            extend_enum(cls,name, name)
+        except:
+            pass
