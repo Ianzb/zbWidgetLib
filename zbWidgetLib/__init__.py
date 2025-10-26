@@ -1154,7 +1154,8 @@ class FileChooser(QFrame):
             return
         if len(file_name) == 0:
             return
-        self.fileChoosedSignal.emit(file_name)
+
+        self.fileChoosedSignal.emit([i for i in file_name if i])
 
     def _checkDragFile(self, urls):
         if len(urls) == 0:

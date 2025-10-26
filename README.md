@@ -42,3 +42,4 @@ zb组件库（zbWidgetLib）是一个PyQt5组件库，提供了一些便捷组�
 2025-09-27：2.7.0：新增ZBF类，支持两款图标。  
 2025-10-02：2.7.2：修复LoadingMessageBox显示异常的Bug，Image支持FIF图标。  
 2025-10-23：2.7.3：修复setNewToolTip重复运行导致多个提示重叠的Bug，新增removeNewToolTip方法。  
+2025-10-26：2.7.4：修复FileChooser返回文件有空字符串的Bug。  
