@@ -481,3 +481,7 @@ class Window(FluentWindow):
         if self.currentEffect() == "Acrylic":
             return QColor(16, 16, 16, 128) if isDarkTheme() else QColor(240, 240, 240, 10)
         return QColor(0, 0, 0, 0)
+    def showEvent(self, e):
+        super().showEvent(e)
+        if self.isEffectEnabled():
+            self.setEffect(self.currentEffect())
