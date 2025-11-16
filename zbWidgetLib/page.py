@@ -450,7 +450,7 @@ class Window(FluentWindow):
         self._isEffectEnabled = True
         self._isMicaEnabled = True
 
-        if self.window().isVisible() and last_effect not in ["Acrylic", "Aero"] and self._currentEffect in ["Acrylic", "Aero"]:
+        if self.window().isVisible() and ((last_effect not in ["Acrylic", "Aero"] and self._currentEffect in ["Acrylic", "Aero"]) or (isDarkTheme() and last_effect in ["Aero"] and self._currentEffect in ["Acrylic"])):
             self.window().hide()
             self.window().show()
         self.setBackgroundColor(self._normalBackgroundColor())
