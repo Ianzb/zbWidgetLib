@@ -441,7 +441,7 @@ class Window(FluentWindow):
             if isDarkTheme():
                 self.windowEffect.setAcrylicEffect(self.winId(), gradientColor="000000CC", animationId=1)
             else:
-                self.windowEffect.setAcrylicEffect(self.winId(), gradientColor="F2F2F230", animationId=1)
+                self.windowEffect.setAcrylicEffect(self.winId(), gradientColor="F2F2F299", animationId=1)
             self._currentEffect = "Acrylic"
 
         elif effect_type == "Aero".lower():
@@ -479,8 +479,9 @@ class Window(FluentWindow):
         if not self.isMicaEffectEnabled():
             return self._darkBackgroundColor if isDarkTheme() else self._lightBackgroundColor
         if self.currentEffect() == "Acrylic":
-            return QColor(16, 16, 16, 128) if isDarkTheme() else QColor(240, 240, 240, 10)
+            return QColor(0, 0, 0, 64) if isDarkTheme() else QColor(0, 0, 0, 0)
         return QColor(0, 0, 0, 0)
+
     def showEvent(self, e):
         super().showEvent(e)
         if self.isEffectEnabled():
