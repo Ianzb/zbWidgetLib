@@ -1,13 +1,12 @@
 [project]
 name = "zbWidgetLib"
-version = "2.9.0.3"
+version = "2.9.1.1"
 description = "zb组件库"
 requires-python = ">=3.12"
 dependencies = [
     "zbToolLib>=2.0.6.1",
-    "PyQt-Fluent-Widgets[full]>=1.9.2",
     "QtPy>=2.4.3",
-    "aenum==3.1.16"
+    "aenum>=3.1.16"
 ]
 authors = [
     { name = "Ianzb", email = "93322252@qq.com" },

@@ -1,14 +1,18 @@
 import functools
-from PyQt5 import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5 import QtCore
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets
 from qtpy import *
+from qtpy.QtCore import *
+from qtpy.QtGui import *
+from qtpy.QtWidgets import *
+from qtpy import QtCore
+from qtpy import QtGui
+from qtpy import QtWidgets
 from qfluentwidgets import *
 from qfluentwidgets.components.material import *
 from qfluentwidgets import FluentIcon as FIF
 
 import zbToolLib as zb
+
+try:
+    pyqtSignal = Signal
+except NameError:
+    Signal = pyqtSignal
