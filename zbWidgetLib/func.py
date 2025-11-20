@@ -5,9 +5,12 @@ import win32gui
 from ctypes import byref
 
 
+import qframelesswindow
+
 @classmethod
 def toggleMaxState(cls, window):
     QT_VERSION = tuple(int(v) for v in qVersion().split('.'))
+
 
     if QT_VERSION < (6, 8, 0):
         if window.isMaximized():
@@ -25,7 +28,7 @@ def toggleMaxState(cls, window):
             window.windowEffect.addWindowAnimation(window.winId())
             win32gui.PostMessage(int(window.winId()), win32con.WM_SYSCOMMAND, win32con.SC_MAXIMIZE, 0)
 
-    utils.win32_utils.releaseMouseLeftButton(window.winId())
+    qframelesswindow.utils.win32_utils.releaseMouseLeftButton(window.winId())
 
 
 def disableBlurBehindWindow(self, hWnd):
@@ -34,9 +37,8 @@ def disableBlurBehindWindow(self, hWnd):
 
         hWnd: int or `sip.voidptr`
         Window handle"""
-    blurBehind = windows.c_structures.DWM_BLURBEHIND(1, False, 0, False)
+    blurBehind = qframelesswindow.windows.c_structures.DWM_BLURBEHIND(1, False, 0, False)
     self.DwmEnableBlurBehindWindow(int(hWnd), byref(blurBehind))
-
 
 @staticmethod
 def removeWindowAnimation(hWnd):
@@ -52,10 +54,9 @@ def removeWindowAnimation(hWnd):
                           win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_NOZORDER |
                           win32con.SWP_FRAMECHANGED)
 
-
-utils.win32_utils.WindowsMoveResize.toggleMaxState = toggleMaxState
-windows.WindowsWindowEffect.disableBlurBehindWindow = disableBlurBehindWindow
-windows.WindowsWindowEffect.removeWindowAnimation = removeWindowAnimation
+qframelesswindow.utils.win32_utils.WindowsMoveResize.toggleMaxState = toggleMaxState
+qframelesswindow.windows.WindowsWindowEffect.disableBlurBehindWindow = disableBlurBehindWindow
+qframelesswindow.windows.WindowsWindowEffect.removeWindowAnimation = removeWindowAnimation
 
 
 def setToolTip(widget, text: str):
