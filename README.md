@@ -1,6 +1,6 @@
 # [zb组件库（zbWidgetLib）](https://ianzb.github.io/project/zbWidgetLib.html)
 
-zb组件库（zbWidgetLib）是一个PyQt5组件库，提供了一些便捷组件，目前用于zb小程序等个人Python项目中。
+zb组件库（zbWidgetLib）是一个PyQt5/PyQt6/PySide2/PySide6组件库，提供了一些便捷组件，目前主要用于Ianzb的个人Python项目中。
 
 ## 链接
 
@@ -48,3 +48,4 @@ zb组件库（zbWidgetLib）是一个PyQt5组件库，提供了一些便捷组�
 2025-11-19：2.9.1.1：适配不同版本的PyQt/PySide。  
 2025-11-20：2.9.2.1：修复无边框窗口库窗口最大化后模糊效果消失的Bug。  
 2025-11-21：2.9.3：ZBF图标支持自定义颜色。  
+2025-11-22：2.9.4：ZBF图标支持设置使用程序主题色。  
