@@ -4,22 +4,55 @@ from aenum import Enum, extend_enum
 
 
 class ZBF(FluentIconBase, Enum):
+
     def __init__(self, *args):
         self.use_theme_color = False
         self.light_color = QColor(0, 0, 0)
         self.dark_color = QColor(255, 255, 255)
 
     def path(self, theme=Theme.AUTO):
-        return zb.joinPath(ZBF._path, f"{self.value}.svg")
+        if hasattr(self, "default_path"):
+            path = self.default_path
+        else:
+            path = ""
+        return zb.joinPath(path, self.value)
 
     @classmethod
-    def setPath(cls, path):
-        cls._path = path
+    def setPath(cls, path: str):
+        """
+        设置在寻找数据不包括图标路径的图标时，默认寻找的路径
+        :param path:
+        """
+        cls.default_path = path
 
     @classmethod
-    def add(cls, name):
+    def setDefaultPath(cls, path: str):
+        """
+        设置在寻找数据不包括图标路径的图标时，默认寻找的路径
+        :param path:
+        """
+        cls.setPath(path)
+
+    @classmethod
+    def add(cls, name: str, data: str = None):
+        """
+        添加图片
+        :param name: 调用时的名称
+        :param data: 图片路径，不填默认使用name值，需要后缀名
+        """
+        if not data:
+            data = name
         if not hasattr(cls, name):
-            extend_enum(cls, name, name)
+            extend_enum(cls, name, data)
+
+    @classmethod
+    def addFromPath(cls, path: str):
+        """
+        从指定路径批量导入图标，会将去除后缀名的文件名称作为图标名称
+        :param path: 文件夹路径
+        """
+        for i in zb.walkFile(path, True):
+            ZBF.add(zb.getFileName(i, False), os.path.abspath(i))
 
     def useThemeColor(self, use_theme_color: bool = True):
         """
