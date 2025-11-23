@@ -81,10 +81,6 @@ class SaveFileBase:
         self.default_path = None
         self.description = None
 
-        self.setText("导出")
-
-        self.clicked.connect(self.clickEvent)
-
     def clickEvent(self):
         text = f"浏览{f"文件" if not self.description else self.description}"
         suffixs = ";;".join([f"{k} ({" ".join(["*" + i.lower() for i in v])})" for k, v in self.suffixs.items()])
@@ -154,16 +150,22 @@ class SaveFilePushButton(PushButton, SaveFileBase):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setText("导出")
+
+        self.clicked.connect(self.clickEvent)
 
 
 class SaveFilePrimaryPushButton(PrimaryPushButton, SaveFileBase):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setText("导出")
+
+        self.clicked.connect(self.clickEvent)
 
 
 class OpenFileBase:
-    fileChoosedSignal = pyqtSignal(str)
+    fileChoosedSignal = pyqtSignal(list)
 
     def __init__(self):
         self.suffixs = {}
@@ -171,10 +173,6 @@ class OpenFileBase:
         self.description = None
         self.only_one = True
         self.mode = "file"
-
-        self.setText("导入")
-
-        self.clicked.connect(self.clickEvent)
 
     def clickEvent(self):
         text = f"浏览{f"文件{"夹" if self.mode == "folder" else ""}" if not self.description else self.description}"
@@ -190,10 +188,23 @@ class OpenFileBase:
             file_name = [file_name]
         else:
             return
+        file_name = [i for i in file_name if i]
         if len(file_name) == 0:
             return
 
-        self.fileChoosedSignal.emit([i for i in file_name if i])
+        self.fileChoosedSignal.emit(file_name)
+
+    def isOnlyOne(self):
+        """
+        获取是否只选择一个文件
+        """
+        return self.only_one
+
+    def setOnlyOne(self, only_one: bool):
+        """
+        设置是否只选择一个文件
+        """
+        self.only_one = only_one
 
     def setFileMode(self):
         """
@@ -283,9 +294,15 @@ class OpenFilePushButton(PushButton, OpenFileBase):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setText("导入")
+
+        self.clicked.connect(self.clickEvent)
 
 
 class OpenFilePrimaryPushButton(PrimaryPushButton, OpenFileBase):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setText("导入")
+
+        self.clicked.connect(self.clickEvent)
