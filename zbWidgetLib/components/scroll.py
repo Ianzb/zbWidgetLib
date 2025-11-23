@@ -1,31 +1,6 @@
 from ..base import *
 from .page import BasicTab
 
-class BetterScrollArea(SmoothScrollArea):
-    def __init__(self, parent=None):
-        """
-        优化样式的滚动区域
-        :param parent:
-        """
-        super().__init__(parent=parent)
-        self.setWidgetResizable(True)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setStyleSheet("QScrollArea {background-color: rgba(0,0,0,0); border: none}")
-
-        self.setScrollAnimation(Qt.Vertical, 500, QEasingCurve.OutQuint)
-        self.setScrollAnimation(Qt.Horizontal, 500, QEasingCurve.OutQuint)
-
-        self.view = QWidget(self)
-        self.view.setStyleSheet("QWidget {background-color: rgba(0,0,0,0); border: none}")
-
-        self.setWidget(self.view)
-
-        self.vBoxLayout = QVBoxLayout(self.view)
-        self.vBoxLayout.setSpacing(30)
-        self.vBoxLayout.setAlignment(Qt.AlignTop)
-        self.vBoxLayout.setContentsMargins(36, 20, 36, 36)
-
-
 class ScrollMessageBoxBase(MessageBoxBase):
 
     def __init__(self, parent=None):
