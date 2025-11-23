@@ -1,16 +1,16 @@
 from .base import *
-
 import win32con
 import win32gui
 from ctypes import byref
 
-
 import qframelesswindow
+
+
+# 全局Hook部分
 
 @classmethod
 def toggleMaxState(cls, window):
     QT_VERSION = tuple(int(v) for v in qVersion().split('.'))
-
 
     if QT_VERSION < (6, 8, 0):
         if window.isMaximized():
@@ -40,6 +40,7 @@ def disableBlurBehindWindow(self, hWnd):
     blurBehind = qframelesswindow.windows.c_structures.DWM_BLURBEHIND(1, False, 0, False)
     self.DwmEnableBlurBehindWindow(int(hWnd), byref(blurBehind))
 
+
 @staticmethod
 def removeWindowAnimation(hWnd):
     """ Disables maximize and minimize animation of the window by removing the relevant window styles. """
@@ -53,6 +54,7 @@ def removeWindowAnimation(hWnd):
     win32gui.SetWindowPos(hWnd, None, 0, 0, 0, 0,
                           win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_NOZORDER |
                           win32con.SWP_FRAMECHANGED)
+
 
 qframelesswindow.utils.win32_utils.WindowsMoveResize.toggleMaxState = toggleMaxState
 qframelesswindow.windows.WindowsWindowEffect.disableBlurBehindWindow = disableBlurBehindWindow
