@@ -26,7 +26,7 @@ class BetterScrollArea(SmoothScrollArea):
         self.vBoxLayout.setContentsMargins(36, 20, 36, 36)
 
 
-class BasicPage(BetterScrollArea):
+class BasicEmptyPage(BetterScrollArea):
 
     def __init__(self, parent=None, title: str = None, subtitle: str = None, icon=None):
         """
@@ -35,22 +35,21 @@ class BasicPage(BetterScrollArea):
         """
         super().__init__(parent=parent)
 
-        self.toolBar = ToolBar(self)
+        self._icon = None
+        self._title = ""
+        self._subtitle = ""
+
         if title:
             self.setTitle(title)
         if subtitle:
             self.setSubtitle(subtitle)
-
-        self.setViewportMargins(0, self.toolBar.height(), 0, 0)
-
-        self._icon = None
 
     def getTitle(self):
         """
         获取主标题
         :return: 主标题
         """
-        return self.toolBar.title()
+        return self._title
 
     def title(self):
         """
@@ -64,7 +63,7 @@ class BasicPage(BetterScrollArea):
         获取副标题
         :return: 副标题
         """
-        return self.toolBar.subtitle()
+        return self._subtitle
 
     def subtitle(self):
         """
@@ -78,14 +77,14 @@ class BasicPage(BetterScrollArea):
         设置主标题
         :param text:
         """
-        self.toolBar.setTitle(text)
+        self._title = text
 
     def setSubtitle(self, text: str):
         """
         设置副标题
         :param text:
         """
-        self.toolBar.setSubtitle(text)
+        self._subtitle = text
 
     def setIcon(self, icon):
         """
@@ -109,7 +108,49 @@ class BasicPage(BetterScrollArea):
         return self.getIcon()
 
 
-class BasicTabPage(BasicPage):
+class BasicPage(BasicEmptyPage):
+
+    def __init__(self, parent=None, title: str = None, subtitle: str = None, icon=None):
+        """
+        基本页面，包含标题和子标题，适用于基本页面，通过类变量修改title和subtitle设置标题和子标题。
+        :param parent:
+        """
+        super().__init__(parent=parent, title=title, subtitle=subtitle, icon=icon)
+
+        self.toolBar = ToolBar(self)
+        if title:
+            self.setTitle(title)
+        if subtitle:
+            self.setSubtitle(subtitle)
+
+        self.setViewportMargins(0, self.toolBar.height() if self._subtitle else self.toolBar.height() - 24, 0, 0)
+
+    def subtitle(self):
+        """
+        获取副标题
+        :return: 副标题
+        """
+        return self.getSubtitle()
+
+    def setTitle(self, text: str):
+        """
+        设置主标题
+        :param text:
+        """
+        super().setTitle(text)
+        self.toolBar.setTitle(text)
+
+    def setSubtitle(self, text: str):
+        """
+        设置副标题
+        :param text:
+        """
+        super().setSubtitle(text)
+        self.toolBar.setSubtitle(text)
+        self.setViewportMargins(0, self.toolBar.height() if self._subtitle else self.toolBar.height() - 24, 0, 0)
+
+
+class BasicTabPage(BasicEmptyPage):
 
     def __init__(self, parent=None):
         """
@@ -119,8 +160,6 @@ class BasicTabPage(BasicPage):
         super().__init__(parent=parent)
 
         self._pages = {}
-
-        self.toolBar.deleteLater()
 
         self.vBoxLayout = QVBoxLayout(self)
         self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
@@ -214,7 +253,7 @@ class BasicTabPage(BasicPage):
             self.pivot.setCurrentItem(widget.objectName())
 
 
-class BasicTab(BasicPage):
+class BasicTab(BasicEmptyPage):
 
     def __init__(self, parent=None):
         """
@@ -222,7 +261,6 @@ class BasicTab(BasicPage):
         :param parent:
         """
         super().__init__(parent=parent)
-        self.toolBar.deleteLater()
         self.setViewportMargins(0, 0, 0, 0)
 
 
