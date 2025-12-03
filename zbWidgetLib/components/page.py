@@ -25,6 +25,8 @@ class BetterScrollArea(SmoothScrollArea):
         self.vBoxLayout.setAlignment(Qt.AlignTop)
         self.vBoxLayout.setContentsMargins(36, 20, 36, 36)
 
+        QScroller.grabGesture(self.viewport(), QScroller.ScrollerGestureType.TouchGesture)
+
 
 class BasicEmptyPage(BetterScrollArea):
 

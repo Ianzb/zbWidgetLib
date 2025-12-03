@@ -14,8 +14,6 @@ class ScrollMessageBoxBase(MessageBoxBase):
 
         self.viewLayout.addWidget(self.scrollArea, 0)
 
-        QScroller.grabGesture(self.viewport(), QScroller.ScrollerGestureType.TouchGesture)
-
 
 class ScrollMessageBox(ScrollMessageBoxBase):
     def __init__(self, title: str, content: str, parent=None):
