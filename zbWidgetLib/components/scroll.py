@@ -1,6 +1,7 @@
 from ..base import *
 from .page import BasicTab
 
+
 class ScrollMessageBoxBase(MessageBoxBase):
 
     def __init__(self, parent=None):
@@ -12,6 +13,8 @@ class ScrollMessageBoxBase(MessageBoxBase):
         self.scrollLayout = self.scrollArea.vBoxLayout
 
         self.viewLayout.addWidget(self.scrollArea, 0)
+
+        QScroller.grabGesture(self.viewport(), QScroller.ScrollerGestureType.TouchGesture)
 
 
 class ScrollMessageBox(ScrollMessageBoxBase):
