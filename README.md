@@ -53,3 +53,4 @@ zb组件库（zbWidgetLib）是一个PyQt5/PyQt6/PySide2/PySide6组件库，提�
 2025-11-25：3.0.1：紧急修复FileChooser误删除的Bug。  
 2025-11-30：3.1.0：新增BasicEmptyPage，优化页面代码。  
 2025-12-03：3.1.1.1：滚动区域支持触屏（实验性）。  
+2025-12-27：3.2.0：新增NewFlyoutAnimationType和NewInfoBadgePosition。  

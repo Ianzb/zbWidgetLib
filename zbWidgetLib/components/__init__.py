@@ -7,3 +7,5 @@ from .page import *
 from .scroll import *
 from .widget import *
 from .window import *
+from .flyout import *
+from .info_badge import *
