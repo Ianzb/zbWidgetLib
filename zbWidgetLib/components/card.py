@@ -742,8 +742,6 @@ class CardGroup(QWidget):
             raise KeyError
         if pos >= 0:
             pos += 1
-        if pos > len(self._cardMap):
-            pos = len(self._cardMap)
         self.boxLayout.insertWidget(pos, card, 0, Qt.AlignmentFlag.AlignTop)
         self._cards.append(card)
         self._cardMap[wid] = card
@@ -920,7 +918,9 @@ class FlowCardGroup(QWidget):
             wid = hex(id(card))
         if wid in self._cardMap:
             raise KeyError
-        if pos >= 0:
+        if pos == -1:
+            pos = len(self._cardMap)
+        elif pos < -1:
             pos += 1
         if pos > len(self._cardMap):
             pos = len(self._cardMap)
