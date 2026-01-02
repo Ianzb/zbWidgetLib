@@ -1,31 +1,11 @@
+from qframelesswindow.windows import WindowsWindowEffect
+
 from ..base import *
 
 
-class Window(FluentWindow):
-    """
-    主窗口
-    """
-
-    def __init__(self):
-        self._currentEffect = ""
-        self._isEffectEnabled = False
-        super().__init__()
-
-    def addPage(self, page, name: str, icon, pos: str):
-        """
-        添加导航栏页面简易版
-        :param page: 页面对象
-        :param pos: 位置top/scroll/bottom
-        """
-        page.setObjectName(name)
-        return self.addSubInterface(page, icon, name, eval(f"NavigationItemPosition.{pos.upper()}"))
-
-    def addSeparator(self, pos: str):
-        """
-        添加导航栏分割线简易版
-        :param pos: 位置top/scroll/bottom
-        """
-        self.navigationInterface.addSeparator(eval(f"NavigationItemPosition.{pos.upper()}"))
+class WindowEffectBase:
+    _currentEffect = ""
+    _isEffectEnabled = False
 
     def setEffect(self, effect_type: str):
         """
@@ -34,6 +14,10 @@ class Window(FluentWindow):
         :return:
         """
         last_effect = self._currentEffect
+
+        if not hasattr(self, "windowEffect"):
+            self.windowEffect = WindowsWindowEffect(self)
+
         self.removeEffect()
         effect_type = effect_type.lower()
         if effect_type == "Mica".lower():
@@ -68,6 +52,9 @@ class Window(FluentWindow):
         self.setBackgroundColor(self._normalBackgroundColor())
 
     def removeEffect(self):
+        if not hasattr(self, "windowEffect"):
+            self.windowEffect = WindowsWindowEffect(self)
+
         self._isMicaEnabled = False
         self._isEffectEnabled = False
         self._currentEffect = ""
@@ -88,7 +75,7 @@ class Window(FluentWindow):
                 self.setEffect(self.currentEffect())
 
     def _normalBackgroundColor(self):
-        if not self.isMicaEffectEnabled():
+        if not self._currentEffect:
             return self._darkBackgroundColor if isDarkTheme() else self._lightBackgroundColor
         if self.currentEffect() == "Acrylic":
             return QColor(0, 0, 0, 64) if isDarkTheme() else QColor(0, 0, 0, 0)
@@ -98,3 +85,28 @@ class Window(FluentWindow):
         super().showEvent(e)
         if self.isEffectEnabled():
             self.setEffect(self.currentEffect())
+
+
+class Window(WindowEffectBase, FluentWindow):
+    """
+    主窗口
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def addPage(self, page, name: str, icon, pos: str):
+        """
+        添加导航栏页面简易版
+        :param page: 页面对象
+        :param pos: 位置top/scroll/bottom
+        """
+        page.setObjectName(name)
+        return self.addSubInterface(page, icon, name, eval(f"NavigationItemPosition.{pos.upper()}"))
+
+    def addSeparator(self, pos: str):
+        """
+        添加导航栏分割线简易版
+        :param pos: 位置top/scroll/bottom
+        """
+        self.navigationInterface.addSeparator(eval(f"NavigationItemPosition.{pos.upper()}"))

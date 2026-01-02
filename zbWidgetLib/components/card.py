@@ -2,6 +2,7 @@ from ..base import *
 from .image import *
 from .widget import StatisticsWidget
 
+
 class DisplayCard(ElevatedCardWidget):
 
     def __init__(self, parent=None):
@@ -125,7 +126,6 @@ class IntroductionCard(ElevatedCardWidget):
         :param text: 文本
         """
         self.bodyLabel.setText(text)
-
 
 
 class GrayCard(QWidget):
@@ -729,18 +729,35 @@ class CardGroup(QWidget):
         if title and self.show_title:
             self.titleLabel.setText(title)
 
-    def addCard(self, card, wid: str | int, pos: int = -1):
+    def addCard(self, card, wid: str | int = None, pos: int = -1):
         """
         添加卡片
         :param card: 卡片组件
-        :param wid: 卡片组件id（不要重复！）
+        :param wid: 卡片组件id（默认使用card）
         :param pos: 卡片放置位置索引（正数0开始，倒数-1开始）
         """
+        if not wid:
+            wid = hex(id(card))
+        if wid in self._cardMap:
+            raise KeyError
         if pos >= 0:
             pos += 1
+        if pos > len(self._cardMap):
+            pos = len(self._cardMap)
         self.boxLayout.insertWidget(pos, card, 0, Qt.AlignmentFlag.AlignTop)
         self._cards.append(card)
         self._cardMap[wid] = card
+        self.cardCountChanged.emit(self.count())
+        return wid
+
+    def addWidget(self, card, wid: str | int = None, pos: int = -1):
+        """
+        添加卡片
+        :param card: 卡片组件
+        :param wid: 卡片组件id（默认使用card）
+        :param pos: 卡片放置位置索引（正数0开始，倒数-1开始）
+        """
+        self.addCard(card, wid, pos)
 
     def removeCard(self, wid: str | int):
         """
@@ -757,6 +774,14 @@ class CardGroup(QWidget):
         card.deleteLater()
 
         self.cardCountChanged.emit(self.count())
+        return wid
+
+    def removeWidget(self, wid: int | str):
+        """
+        移除卡片
+        :param wid: 卡片组件id
+        """
+        self.removeCard(wid)
 
     def getCard(self, wid: str | int):
         """
@@ -766,13 +791,48 @@ class CardGroup(QWidget):
         """
         return self._cardMap.get(wid)
 
-    def card(self, wid: str | int):
+    def getWidget(self, wid: str | int):
         """
         寻找卡片
         :param wid: 卡片组件id
         :return: 卡片组件
         """
-        return self.getCard(wid)
+        self.getCard(wid)
+
+    def getCards(self):
+        """
+        获取卡片
+        :return:
+        """
+        return self._cards
+
+    def getWidgets(self):
+        """
+        获取卡片
+        :return:
+        """
+        return self.getCards()
+
+    def getWids(self):
+        """
+        获取组件id
+        :return:
+        """
+        return list(self._cardMap.keys())
+
+    def getCardMap(self):
+        """
+        获取wid卡片映射表
+        :return:
+        """
+        return self._cardMap
+
+    def getWidgetMap(self):
+        """
+        获取wid卡片映射表
+        :return:
+        """
+        return self.getCardMap()
 
     def count(self):
         """
@@ -787,6 +847,13 @@ class CardGroup(QWidget):
         """
         while self._cardMap:
             self.removeCard(next(iter(self._cardMap)))
+            QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
+
+    def clearWidget(self):
+        """
+        清空卡片
+        """
+        self.clearCard()
 
     def getTitle(self):
         """
@@ -816,3 +883,157 @@ class CardGroup(QWidget):
         """
         self.titleLabel.setHidden(not enabled)
 
+
+WidgetGroup = CardGroup
+
+
+class FlowCardGroup(QWidget):
+    cardCountChanged = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        """
+        卡片组
+        :param parent:
+        :param show_title: 是否显示标题
+        :param is_v: 是否竖向排列
+        """
+        super().__init__(parent=parent)
+        self._cards = []
+        self._cardMap = {}
+
+        self.flowLayout = FlowLayout(self)
+        self.flowLayout.setSpacing(5)
+        self.flowLayout.setContentsMargins(0, 0, 0, 0)
+        self.flowLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        self.vBoxLayout = self.flowLayout
+        self.hBoxLayout = self.flowLayout
+
+    def addCard(self, card, wid: str | int = None, pos: int = -1):
+        """
+        添加卡片
+        :param card: 卡片组件
+        :param wid: 卡片组件id（默认使用card）
+        :param pos: 卡片放置位置索引（正数0开始，倒数-1开始）
+        """
+        if not wid:
+            wid = hex(id(card))
+        if wid in self._cardMap:
+            raise KeyError
+        if pos >= 0:
+            pos += 1
+        if pos > len(self._cardMap):
+            pos = len(self._cardMap)
+        self.flowLayout.insertWidget(pos, card)
+        self._cards.append(card)
+        self._cardMap[wid] = card
+        self.cardCountChanged.emit(self.count())
+        return wid
+
+    def addWidget(self, card, wid: str | int = None, pos: int = -1):
+        """
+        添加卡片
+        :param card: 卡片组件
+        :param wid: 卡片组件id（默认使用card）
+        :param pos: 卡片放置位置索引（正数0开始，倒数-1开始）
+        """
+        self.addWidget(card, wid, pos)
+
+    def removeCard(self, wid: str | int):
+        """
+        移除卡片
+        :param wid: 卡片组件id
+        """
+        if wid not in self._cardMap:
+            return
+
+        card = self._cardMap.pop(wid)
+        self._cards.remove(card)
+        self.flowLayout.removeWidget(card)
+        card.hide()
+        card.deleteLater()
+
+        self.cardCountChanged.emit(self.count())
+        return wid
+
+    def removeWidget(self, wid: str | int):
+        """
+        移除卡片
+        :param wid: 卡片组件id
+        """
+        self.removeCard(wid)
+
+    def getCard(self, wid: str | int):
+        """
+        寻找卡片
+        :param wid: 卡片组件id
+        :return: 卡片组件
+        """
+        return self._cardMap.get(wid)
+
+    def getWidget(self, wid: str | int):
+        """
+        寻找卡片
+        :param wid: 卡片组件id
+        :return: 卡片组件
+        """
+        self.getCard(wid)
+
+    def getCards(self):
+        """
+        获取卡片
+        :return:
+        """
+        return self._cards
+
+    def getWidgets(self):
+        """
+        获取卡片
+        :return:
+        """
+        return self.getCards()
+
+    def getWids(self):
+        """
+        获取组件id
+        :return:
+        """
+        return list(self._cardMap.keys())
+
+    def getCardMap(self):
+        """
+        获取wid卡片映射表
+        :return:
+        """
+        return self._cardMap
+
+    def getWidgetMap(self):
+        """
+        获取wid卡片映射表
+        :return:
+        """
+        self.getCardMap()
+
+    def count(self):
+        """
+        卡片数量
+        :return: 卡片数量
+        """
+        return len(self._cards)
+
+    def clearCard(self):
+        """
+        清空卡片
+        """
+        while self._cardMap:
+            self.removeCard(next(iter(self._cardMap)))
+            QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
+
+    def clearWidget(self):
+        """
+        清空卡片
+        """
+        self.clearCard()
+
+
+FlowWidgetGroup = FlowCardGroup

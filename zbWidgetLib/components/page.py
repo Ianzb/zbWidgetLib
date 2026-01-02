@@ -28,23 +28,10 @@ class BetterScrollArea(SmoothScrollArea):
         QScroller.grabGesture(self.viewport(), QScroller.ScrollerGestureType.TouchGesture)
 
 
-class BasicEmptyPage(BetterScrollArea):
-
-    def __init__(self, parent=None, title: str = None, subtitle: str = None, icon=None):
-        """
-        基本页面，包含标题和子标题，适用于基本页面，通过类变量修改title和subtitle设置标题和子标题。
-        :param parent:
-        """
-        super().__init__(parent=parent)
-
-        self._icon = None
-        self._title = ""
-        self._subtitle = ""
-
-        if title:
-            self.setTitle(title)
-        if subtitle:
-            self.setSubtitle(subtitle)
+class PageInfoBase:
+    _icon = ""
+    _title = ""
+    _subtitle = ""
 
     def getTitle(self):
         """
@@ -108,6 +95,21 @@ class BasicEmptyPage(BetterScrollArea):
         :return: 图标
         """
         return self.getIcon()
+
+
+class BasicEmptyPage(BetterScrollArea, PageInfoBase):
+
+    def __init__(self, parent=None, title: str = None, subtitle: str = None, icon=None):
+        """
+        基本页面，包含标题和子标题，适用于基本页面，通过类变量修改title和subtitle设置标题和子标题。
+        :param parent:
+        """
+        super().__init__(parent=parent)
+
+        if title:
+            self.setTitle(title)
+        if subtitle:
+            self.setSubtitle(subtitle)
 
 
 class BasicPage(BasicEmptyPage):
@@ -291,7 +293,7 @@ class ChangeableTab(BasicTab):
         widget.setParent(self)
         widget.hide()
         if not wid:
-            wid = widget.objectName()
+            wid = hex(id(widget))
         self._pages[wid] = widget
         if alignment:
             self.vBoxLayout.addWidget(widget, 0, alignment)
