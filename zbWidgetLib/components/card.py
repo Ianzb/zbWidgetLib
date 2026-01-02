@@ -845,7 +845,6 @@ class CardGroup(QWidget):
         """
         while self._cardMap:
             self.removeCard(next(iter(self._cardMap)))
-            QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
 
     def clearWidget(self):
         """
@@ -1027,7 +1026,6 @@ class FlowCardGroup(QWidget):
         """
         while self._cardMap:
             self.removeCard(next(iter(self._cardMap)))
-            QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
 
     def clearWidget(self):
         """
