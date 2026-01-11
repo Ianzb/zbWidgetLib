@@ -78,7 +78,7 @@ class ComboBoxWithLabel(QWidget):
         self.hBoxLayout.setContentsMargins(0, 0, 0, 0)
 
         self.label = BodyLabel("", self)
-        self.comboBox = AcrylicComboBox(self)
+        self.comboBox = ComboBox(self)
 
         self.hBoxLayout.addWidget(self.label, 0, Qt.AlignCenter)
         self.hBoxLayout.addWidget(self.comboBox)
@@ -205,7 +205,7 @@ class PageSpliter(QWidget):
         self.label5 = BodyLabel("/", self)
         self.label6 = BodyLabel("页", self)
 
-        self.comboBox = AcrylicComboBox(self)
+        self.comboBox = ComboBox(self)
 
     def _setup_layout(self):
         """设置布局并添加组件"""
@@ -674,3 +674,32 @@ class PageSpliter(QWidget):
         :return: 项目总数（-1表示无限制）
         """
         return self.total_count
+
+class LineEditWithLabel(QWidget):
+    @functools.singledispatchmethod
+    def __init__(self, parent: QWidget = None):
+        super().__init__(parent)
+
+        self.hBoxLayout = QHBoxLayout(self)
+        self.hBoxLayout.setSpacing(4)
+        self.hBoxLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.label = BodyLabel("", self)
+        self.lineEdit = LineEdit(self)
+
+        self.hBoxLayout.addWidget(self.label, 0, Qt.AlignCenter)
+        self.hBoxLayout.addWidget(self.lineEdit)
+
+    @__init__.register
+    def _(self, text: str, parent: QWidget = None):
+        self.__init__(parent)
+        self.label.setText(text)
+
+    def __getattr__(self, name: str):
+        try:
+            return getattr(self.lineEdit, name)
+        except AttributeError:
+            try:
+                return getattr(self.label, name)
+            except AttributeError:
+                raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")

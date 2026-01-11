@@ -56,3 +56,4 @@ zb组件库（zbWidgetLib）是一个PyQt5/PyQt6/PySide2/PySide6组件库，提�
 2025-12-27：3.2.0：新增NewFlyoutAnimationType和NewInfoBadgePosition。  
 2026-01-02：3.3.0.2：独立WindowEffectBase，优化CardGroup方法，支持WidgetGroup系列别名，新增FlowCardGroup，优化各处wid支持默认根据id生成。  
 2026-01-06：3.3.1：新增不强制置顶的SimpleSplashScreen。  
+2026-01-11：3.3.2：新增LineEditWithLabel，取消使用AcrylicComboBox。  
