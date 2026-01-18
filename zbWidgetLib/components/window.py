@@ -4,8 +4,12 @@ from ..base import *
 
 
 class WindowEffectBase:
-    _currentEffect = ""
-    _isEffectEnabled = False
+
+    def __init__(self, *args):
+        if not hasattr(self, "windowEffect"):
+            self.windowEffect = WindowsWindowEffect(self)
+        self._currentEffect = ""
+        self._isEffectEnabled = False
 
     def setEffect(self, effect_type: str):
         """
@@ -14,9 +18,6 @@ class WindowEffectBase:
         :return:
         """
         last_effect = self._currentEffect
-
-        if not hasattr(self, "windowEffect"):
-            self.windowEffect = WindowsWindowEffect(self)
 
         self.removeEffect()
         effect_type = effect_type.lower()
@@ -52,8 +53,6 @@ class WindowEffectBase:
         self.setBackgroundColor(self._normalBackgroundColor())
 
     def removeEffect(self):
-        if not hasattr(self, "windowEffect"):
-            self.windowEffect = WindowsWindowEffect(self)
 
         self._isMicaEnabled = False
         self._isEffectEnabled = False
@@ -87,7 +86,7 @@ class WindowEffectBase:
             self.setEffect(self.currentEffect())
 
 
-class Window(WindowEffectBase, FluentWindow):
+class Window(FluentWindow, WindowEffectBase):
     """
     主窗口
     """
