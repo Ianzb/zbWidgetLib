@@ -10,3 +10,4 @@ from .window import *
 from .flyout import *
 from .info_badge import *
 from .splash_screen import *
+from .progress import *

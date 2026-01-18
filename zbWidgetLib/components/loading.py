@@ -1,22 +1,24 @@
 from ..base import *
 from .card import DisplayCard
+from .progress import CustomProgressRing
+
 
 class LoadingCard(DisplayCard):
 
-    def __init__(self, parent=None, is_random: bool = True):
+    def __init__(self, parent=None, indeterminate: bool = True):
         """
         加载中卡片
         """
         super().__init__(parent)
-        if is_random:
-            self.progressRing = IndeterminateProgressRing()
-        else:
-            self.progressRing = ProgressRing()
+        self.progressRing = CustomProgressRing(indeterminate=indeterminate)
         self.setDisplay(self.progressRing)
         self.setText("加载中...")
 
     def setVal(self, val: int):
         self.progressRing.setVal(val)
+
+    def setValue(self, val: int):
+        self.setVal(val)
 
     def setProgress(self, val: int):
         self.setVal(val)
@@ -24,12 +26,15 @@ class LoadingCard(DisplayCard):
     def getVal(self):
         return self.progressRing.getVal()
 
+    def getValue(self):
+        return self.getVal()
+
     def getProgress(self):
         return self.getVal()
 
 
 class LoadingMessageBox(MaskDialogBase):
-    def __init__(self, parent=None, is_random: bool = True):
+    def __init__(self, parent=None, indeterminate: bool = True):
         super().__init__(parent=parent)
 
         self._hBoxLayout.removeWidget(self.widget)
@@ -41,10 +46,8 @@ class LoadingMessageBox(MaskDialogBase):
         self.setShadowEffect(60, (0, 10), QColor(0, 0, 0, 50))
         self.setMaskColor(QColor(0, 0, 0, 76))
 
-        if is_random:
-            self.progressRing = IndeterminateProgressRing()
-        else:
-            self.progressRing = ProgressRing()
+        self.progressRing = CustomProgressRing(indeterminate=indeterminate)
+
         self.loadingCard = DisplayCard(self.widget)
         self.loadingCard.setText("加载中...")
         setattr(self.loadingCard, "_normalBackgroundColor", lambda: QColor(16, 16, 16, 220) if isDarkTheme() else QColor(255, 255, 255, 220))
@@ -58,11 +61,17 @@ class LoadingMessageBox(MaskDialogBase):
     def setVal(self, val: int):
         self.progressRing.setVal(val)
 
+    def setValue(self, val: int):
+        self.setVal(val)
+
     def setProgress(self, val: int):
         self.setVal(val)
 
     def getVal(self):
         return self.progressRing.getVal()
+
+    def getValue(self):
+        return self.getVal()
 
     def getProgress(self):
         return self.getVal()
@@ -115,4 +124,3 @@ class LoadingMessageBox(MaskDialogBase):
             except:
                 pass
         super().closeEvent(e)
-
