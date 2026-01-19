@@ -11,6 +11,19 @@ class WindowEffectBase:
         self._currentEffect = ""
         self._isEffectEnabled = False
 
+        self._installHooks()
+
+    def _installHooks(self):
+        original_show_event = self.showEvent
+
+        def patched_show_event(e):
+            original_show_event(e)
+
+            if self.isEffectEnabled():
+                self.setEffect(self.currentEffect())
+
+        self.showEvent = patched_show_event
+
     def setEffect(self, effect_type: str):
         """
         设置窗口效果
