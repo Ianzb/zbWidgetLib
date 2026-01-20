@@ -936,7 +936,7 @@ class FlowCardGroup(QWidget):
         :param wid: 卡片组件id（默认使用card）
         :param pos: 卡片放置位置索引（正数0开始，倒数-1开始）
         """
-        self.addWidget(card, wid, pos)
+        self.addCard(card, wid, pos)
 
     def removeCard(self, wid: str | int):
         """

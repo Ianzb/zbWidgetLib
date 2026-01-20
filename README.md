@@ -59,3 +59,4 @@ zb组件库（zbWidgetLib）是一个PyQt5/PyQt6/PySide2/PySide6组件库，提�
 2026-01-11：3.3.2：新增LineEditWithLabel，取消使用AcrylicComboBox。  
 2026-01-18：3.4.0.1：加入三个新增的进度条组件，支持随机和固定值状态切换，背景、大小、粗细等设置。修复窗口启动时窗口效果迟钝出现的Bug。  
 2026-01-19：3.4.1：修复窗口效果背景在showEvent后恢复为Mica的Bug。  
+2026-01-20：3.4.2：修复FlowCardGroup的addWidget接口错误的Bug。  
