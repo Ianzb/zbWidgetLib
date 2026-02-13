@@ -54,6 +54,10 @@ class ZBF(FluentIconBase, Enum):
         for i in zb.walkFile(path, True):
             ZBF.add(zb.getFileName(i, False), os.path.abspath(i))
 
+    @classmethod
+    def addInternalPath(cls):
+        cls.addFromPath(zb.joinPath(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "icons"))
+
     def useThemeColor(self, use_theme_color: bool = True):
         """
         使用程序主题色
@@ -147,3 +151,6 @@ class ZBF(FluentIconBase, Enum):
             attributes.update(fill=color.name())
         icon = writeSvg(icon, indexes, **attributes).encode()
         drawSvgIcon(icon, painter, rect)
+
+
+ZBF.addInternalPath()
