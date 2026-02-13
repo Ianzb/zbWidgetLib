@@ -61,4 +61,4 @@ zb组件库（zbWidgetLib）是一个PyQt5/PyQt6/PySide2/PySide6组件库，提�
 2026-01-19：3.4.1：修复窗口效果背景在showEvent后恢复为Mica的Bug。  
 2026-01-20：3.4.2：修复FlowCardGroup的addWidget接口错误的Bug。  
 2026-02-07：3.4.3：由于无边框窗口库更新，取消2.9.2.1版本对组件库Bug的修复。  
-2026-02-13：3.5.0：新增单独的内置图标接口，PageSpliter新增总数显示，首页尾页按钮。  
+2026-02-13：3.5.0.1：新增单独的内置图标接口，PageSpliter新增总数显示，首页尾页按钮。  

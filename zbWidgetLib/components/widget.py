@@ -166,7 +166,7 @@ class PageSpliter(QWidget):
     def _create_ui_components(self):
         self.hBoxLayout = QHBoxLayout(self)
         self.hBoxLayout.setContentsMargins(0, 0, 0, 0)
-        self.hBoxLayout.setSpacing(8)
+        self.hBoxLayout.setSpacing(4)
 
         self.firstButton = TransparentToolButton(ZBF.SkipStartFill, self)
         self.firstButton.clicked.connect(lambda: self.setPage(1))
