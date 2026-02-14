@@ -1,6 +1,6 @@
 [project]
 name = "zbWidgetLib"
-version = "3.5.0.1"
+version = "3.5.1"
 description = "zb组件库"
 requires-python = ">=3.12"
 dependencies = [
@@ -32,3 +32,9 @@ build-backend = "setuptools.build_meta"
 
 [project.urls]
 Repository = "https://github.com/Ianzb/zbWidgetLib/"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+zbWidgetLib = ["icons/*", "icons/**/*"]
