@@ -63,3 +63,4 @@ zb组件库（zbWidgetLib）是一个PyQt5/PyQt6/PySide2/PySide6组件库，提�
 2026-02-07：3.4.3：由于无边框窗口库更新，取消2.9.2.1版本对组件库Bug的修复。  
 2026-02-13：3.5.0.1：新增单独的内置图标接口，PageSpliter新增总数显示，首页尾页按钮。  
 2026-02-14：3.5.1：修复打包内置图标错误的Bug。  
+2026-02-15：3.6.0：为Fluent组件库MaskDialogBase添加渐隐动画。重命名setNewToolTip和removeNewToolTip，让其全局替换默认setToolTip方法。  

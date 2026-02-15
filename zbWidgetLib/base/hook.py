@@ -1,23 +1,24 @@
 from .base import *
 
 
-def setToolTip(widget, text: str):
-    widget.setToolTip(text)
-    if not hasattr(widget, "newToolTipEventFilter"):
-        widget.newToolTipEventFilter = ToolTipFilter(widget, 1000)
-    widget.installEventFilter(widget.newToolTipEventFilter)
+def QWidgetSetToolTip(self, text: str):
+    self.setOldToolTip(text)
+    if not hasattr(self, "newToolTipEventFilter"):
+        self.newToolTipEventFilter = ToolTipFilter(self, 1000)
+    self.installEventFilter(self.newToolTipEventFilter)
 
 
-def removeToolTip(widget):
-    if hasattr(widget, "newToolTipEventFilter"):
-        widget.removeEventFilter(widget.newToolTipEventFilter)
-        widget.newToolTipEventFilter.deleteLater()
-        del widget.newToolTipEventFilter
-    widget.setToolTip("")
+def QWidgetRemoveToolTip(self):
+    if hasattr(self, "newToolTipEventFilter"):
+        self.removeEventFilter(self.newToolTipEventFilter)
+        self.newToolTipEventFilter.deleteLater()
+        del self.newToolTipEventFilter
+    self.setOldToolTip("")
 
 
-QWidget.setNewToolTip = setToolTip
-QWidget.removeNewToolTip = removeToolTip
+QWidget.setOldToolTip = QWidget.setToolTip
+QWidget.setToolTip = QWidgetSetToolTip
+QWidget.removeToolTip = QWidgetRemoveToolTip
 
 
 def setSelectable(widget):
@@ -26,3 +27,25 @@ def setSelectable(widget):
 
 
 QLabel.setSelectable = setSelectable
+
+
+def MaskDialogBaseHide(self):
+    """ fade out """
+    self.widget.setGraphicsEffect(None)
+    opacityEffect = QGraphicsOpacityEffect(self)
+    self.setGraphicsEffect(opacityEffect)
+    opacityAni = QPropertyAnimation(opacityEffect, b'opacity', self)
+    opacityAni.setStartValue(1)
+    opacityAni.setEndValue(0)
+    opacityAni.setDuration(100)
+    opacityAni.finished.connect(self._onHide)
+    opacityAni.start()
+
+
+def MaskDialogBase_onHide(self):
+    self.setGraphicsEffect(None)
+    super(MaskDialogBase, self).hide()
+
+
+MaskDialogBase.hide = MaskDialogBaseHide
+MaskDialogBase._onHide = MaskDialogBase_onHide

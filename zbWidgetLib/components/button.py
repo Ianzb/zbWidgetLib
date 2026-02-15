@@ -32,7 +32,7 @@ class CopyTextButton(ToolButton):
         self._text = text
         self._data_type = data_type
 
-        self.setNewToolTip(f"点击复制{self._data_type}信息！")
+        self.setToolTip(f"点击复制{self._data_type}信息！")
 
     def getText(self):
         """
