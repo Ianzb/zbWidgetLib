@@ -1,0 +1,103 @@
+name: 上传 Python 包
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release-build:
+    name: 构建发行包
+    runs-on: windows-latest
+    outputs:
+      package: ${{ steps.meta.outputs.package }}
+      version: ${{ steps.meta.outputs.version }}
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v6
+
+      - name: 设置 Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: 缓存 pip
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: 安装构建依赖
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: 构建分发包 (sdist 和 wheel)
+        run: |
+          python -m build --sdist --wheel
+
+      - name: 提取包名与版本
+        id: meta
+        run: |
+          python - <<'PY'
+          import tomllib, pathlib
+          p = pathlib.Path('pyproject.toml')
+          data = tomllib.loads(p.read_text(encoding='utf-8'))
+          proj = data.get('project', {})
+          pkg = proj.get('name', 'PACKAGE_NAME_PLACEHOLDER')
+          ver = proj.get('version', '')
+          # write outputs to a file so we can append to GITHUB_OUTPUT
+          with open('meta.txt', 'w', encoding='utf-8') as f:
+              f.write(f"package={pkg}\nversion={ver}\n")
+          PY
+          # append to GITHUB_OUTPUT so the step outputs are available
+          cat meta.txt >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: 验证构建版本
+        shell: bash
+        run: |
+          ls -l dist || (echo "未找到 dist 目录" && exit 1)
+          if [ -z "${{ steps.meta.outputs.version }}" ]; then
+            echo "无法从 pyproject.toml 提取版本" && exit 1
+          fi
+          echo "在 dist 中查找版本: ${{ steps.meta.outputs.version }}"
+          if ! ls dist | grep -F "${{ steps.meta.outputs.version }}" >/dev/null 2>&1; then
+            echo "错误: 构建文件名不包含版本 ${{ steps.meta.outputs.version }}" && exit 1
+          fi
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dists
+          path: dist/
+
+  pypi-publish:
+    name: 发布到 PyPI
+    runs-on: ubuntu-latest
+    needs: release-build
+    permissions:
+      id-token: write
+
+    environment: release
+
+    steps:
+      - name: 下载构建产物
+        uses: actions/download-artifact@v4
+        with:
+          name: release-dists
+          path: dist/
+
+      - name: 发布到 PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          skip-existing: false
+          verbose: true
