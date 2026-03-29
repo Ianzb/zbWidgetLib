@@ -4,9 +4,9 @@ version = "3.6.1"
 description = "zb组件库"
 requires-python = ">=3.12"
 dependencies = [
-    "zbToolLib>=2.0.7",
+    "zbToolLib>=2.0.8.1",
     "QtPy>=2.4.3",
-    "aenum>=3.1.16"
+    "aenum>=3.1.17"
 ]
 authors = [
     { name = "Ianzb", email = "93322252@qq.com" },
