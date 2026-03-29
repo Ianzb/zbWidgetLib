@@ -47,5 +47,5 @@ def MaskDialogBase_onHide(self):
     super(MaskDialogBase, self).hide()
 
 
-MaskDialogBase.hide = MaskDialogBaseHide
-MaskDialogBase._onHide = MaskDialogBase_onHide
+# MaskDialogBase.hide = MaskDialogBaseHide
+# MaskDialogBase._onHide = MaskDialogBase_onHide
