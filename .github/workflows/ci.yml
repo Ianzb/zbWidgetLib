@@ -1,0 +1,71 @@
+name: CI Build
+
+env:
+  PROGRAM_NAME: "zbWidgetLib"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - "zbWidgetLib/**"
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "zbWidgetLib/**"
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v6
+
+      - name: 设置 Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: 安装 uv
+        uses: astral-sh/setup-uv@v8.1.0
+
+      - name: 安装项目
+        run: uv sync --all-extras --dev
+
+      - name: 获取版本号
+        id: get_version
+        shell: pwsh
+        run: |
+          uv run script\release_build.py
+          $out = Get-Content -Raw script\release_output.json | ConvertFrom-Json
+          $version = $out.version
+          Write-Output "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: 生成 CI 版本号
+        id: generate_ci_version
+        shell: pwsh
+        run: |
+          $base = "${{ steps.get_version.outputs.version }}"
+          $ci   = "$base+ci$env:GITHUB_RUN_NUMBER"
+          Write-Output "ci_version=$ci" >> $env:GITHUB_OUTPUT
+          Write-Host "CI Version: $ci"
+
+      - name: 修改版本号
+        shell: pwsh
+        run: |
+          uv run script\release_build.py -v "${{ steps.generate_ci_version.outputs.ci_version }}"
+
+      - name: 构建分发包
+        run: |
+          uv build --no-sources
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.PROGRAM_NAME }} "${{ steps.generate_ci_version.outputs.ci_version }}".zip
+          path: dist/
