@@ -67,5 +67,5 @@ jobs:
       - name: 上传构建产物
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.PROGRAM_NAME }} "${{ steps.generate_ci_version.outputs.ci_version }}".zip
+          name: ${{ env.PROGRAM_NAME }}.zip
           path: dist/
