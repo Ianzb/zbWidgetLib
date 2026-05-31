@@ -1,34 +1,29 @@
 [project]
 name = "zbWidgetLib"
-version = "3.6.1"
+version = "3.6.2b1"
 description = "zb组件库"
 requires-python = ">=3.12"
-dependencies = [
-    "zbToolLib>=2.0.8.1",
-    "QtPy>=2.4.3",
-    "aenum>=3.1.17"
-]
-authors = [
-    { name = "Ianzb", email = "93322252@qq.com" },
-]
-maintainers = [
-    { name = "Ianzb", email = "93322252@qq.com" },
-]
+dependencies = [ "zbToolLib>=2.0.8.1", "QtPy>=2.4.3", "aenum>=3.1.17",]
 readme = "README.md"
-license = { text = "GPLv3 License" }
-keywords = ["zb", "Ianzb", "widget", "lib"]
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.13",
-    "Operating System :: OS Independent",
-    "Operating System :: Microsoft :: Windows",
-    "Operating System :: MacOS :: MacOS X",
-    "Operating System :: POSIX :: Linux",
-]
+keywords = [ "zb", "Ianzb", "widget", "lib",]
+classifiers = [ "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.13", "Operating System :: OS Independent", "Operating System :: Microsoft :: Windows", "Operating System :: MacOS :: MacOS X", "Operating System :: POSIX :: Linux",]
+[[project.authors]]
+name = "Ianzb"
+email = "93322252@qq.com"
+
+[[project.maintainers]]
+name = "Ianzb"
+email = "93322252@qq.com"
 
 [build-system]
-requires = ["setuptools"]
+requires = [ "setuptools",]
 build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [ "toml>=0.10.2",]
+
+[project.license]
+text = "GPLv3 License"
 
 [project.urls]
 Repository = "https://github.com/Ianzb/zbWidgetLib/"
@@ -37,11 +32,7 @@ Repository = "https://github.com/Ianzb/zbWidgetLib/"
 include-package-data = true
 
 [tool.setuptools.package-data]
-zbWidgetLib = ["icons/*", "icons/**/*"]
-
-
-[dependency-groups]
-dev = [ "toml>=0.10.2",]
+zbWidgetLib = [ "icons/*", "icons/**/*",]
 
 [tool.setuptools.packages.find]
 where = [ ".",]
