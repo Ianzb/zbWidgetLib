@@ -231,8 +231,8 @@ class PageSpliter(QWidget):
             self.lineEdit1.setValidator(QIntValidator(1, self.max_page))
             self.lineEdit2.setValidator(QIntValidator(1, self.max_length))
 
-        self.lineEdit1.returnPressed.connect(lambda: self.setPage(int(self.lineEdit1.text())))
-        self.lineEdit2.returnPressed.connect(lambda: self.setLength(int(self.lineEdit2.text())))
+        self.lineEdit1.editingFinished.connect(lambda: self.setPage(int(self.lineEdit1.text())))
+        self.lineEdit2.editingFinished.connect(lambda: self.setLength(int(self.lineEdit2.text())))
 
         self.comboBox.addItems([str(i) + " / 页" for i in self.preset_length])
         self.comboBox.currentTextChanged.connect(lambda text: self.setLength(int(text[:-4] if text else 0)))

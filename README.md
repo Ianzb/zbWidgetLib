@@ -66,3 +66,4 @@ zb组件库（zbWidgetLib）是一个PyQt5/PyQt6/PySide2/PySide6组件库，提�
 2026-02-15：3.6.0：为Fluent组件库MaskDialogBase添加渐隐动画。重命名setNewToolTip和removeNewToolTip，让其全局替换默认setToolTip方法。  
 2026-03-29：3.6.1：撤销hook渐隐动画。  
 2026-05-31：3.6.2b1：迁移至uv。  
+2026-07-24：3.6.2：修复PageSpliter输入框事件触发异常的问题。  
