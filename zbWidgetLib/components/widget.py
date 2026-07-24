@@ -225,17 +225,16 @@ class PageSpliter(QWidget):
 
     def _initialize_state(self):
         if self.max_page <= 0:
-            self.lineEdit1.setValidator(QIntValidator(1, 1000))
-            self.lineEdit2.setValidator(QIntValidator(1, 1000))
+            self.lineEdit1.setValidator(StrictIntValidator(1, 1000))
         else:
-            self.lineEdit1.setValidator(QIntValidator(1, self.max_page))
-            self.lineEdit2.setValidator(QIntValidator(1, self.max_length))
+            self.lineEdit1.setValidator(StrictIntValidator(1, self.max_page))
+        self.lineEdit2.setValidator(StrictIntValidator(1, self.max_length))
 
-        self.lineEdit1.editingFinished.connect(lambda: self.setPage(int(self.lineEdit1.text())))
-        self.lineEdit2.editingFinished.connect(lambda: self.setLength(int(self.lineEdit2.text())))
+        self.lineEdit1.editingFinished.connect(self._on_page_input_finished)
+        self.lineEdit2.editingFinished.connect(self._on_length_input_finished)
 
         self.comboBox.addItems([str(i) + " / 页" for i in self.preset_length])
-        self.comboBox.currentTextChanged.connect(lambda text: self.setLength(int(text[:-4] if text else 0)))
+        self.comboBox.currentTextChanged.connect(self._on_combo_length_changed)
 
         self.setShowMax(self.show_max)
         self.setShowJumpInput(self.show_jump_input)
@@ -246,6 +245,34 @@ class PageSpliter(QWidget):
         self._adjustButtonCount()
         self.setPage(1, False)
         self._updateTotalCountLabel()
+
+    def _on_page_input_finished(self):
+        text = self.lineEdit1.text().strip()
+        if not text or not text.isdigit():
+            self.lineEdit1.setText(str(self.page))
+            return
+        page = int(text)
+        if page != self.page:
+            self.setPage(page)
+
+    def _on_length_input_finished(self):
+        text = self.lineEdit2.text().strip()
+        if not text or not text.isdigit():
+            self.lineEdit2.setText(str(self.length))
+            return
+        length = int(text)
+        if length != self.length:
+            self.setLength(length)
+
+    def _on_combo_length_changed(self, text: str):
+        if not text:
+            return
+        num_str = text.split()[0]
+        if not num_str.isdigit():
+            return
+        length = int(num_str)
+        if length != self.length:
+            self.setLength(length)
 
     def _adjustButtonCount(self):
         display_count = self.max_visible
@@ -414,9 +441,9 @@ class PageSpliter(QWidget):
         self.max_page = max_page
 
         if self.max_page <= 0:
-            self.lineEdit1.setValidator(QIntValidator(1, 1000))
+            self.lineEdit1.setValidator(StrictIntValidator(1, 1000))
         else:
-            self.lineEdit1.setValidator(QIntValidator(1, self.max_page))
+            self.lineEdit1.setValidator(StrictIntValidator(1, self.max_page))
 
         self.label2.setVisible(self.show_max and self.show_jump_input and self.max_page > 0)
         self.label3.setText(str(self.max_page))
@@ -575,10 +602,7 @@ class PageSpliter(QWidget):
         if self.preset_length:
             self.setPresetLength(self.preset_length)
 
-        if self.max_page <= 0:
-            self.lineEdit2.setValidator(QIntValidator(1, 1000))
-        else:
-            self.lineEdit2.setValidator(QIntValidator(1, self.max_length))
+        self.lineEdit2.setValidator(StrictIntValidator(1, self.max_length))
 
     def getMaxLength(self):
         """
