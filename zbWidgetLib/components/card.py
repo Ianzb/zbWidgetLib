@@ -717,6 +717,13 @@ class CardGroup(QWidget):
         self.vBoxLayout = self.boxLayout
         self.hBoxLayout = self.boxLayout
 
+        # 滚动内容尺寸同步定时器（零毫秒单发）：把同一事件循环内的多次触发
+        # （卡片增删 / 换行 / 视口变化）合并为一次同步
+        self._scrollSyncTimer = QTimer(self)
+        self._scrollSyncTimer.setSingleShot(True)
+        self._scrollSyncTimer.setInterval(0)
+        self._scrollSyncTimer.timeout.connect(self._syncScrollContentSize)
+
     @__init__.register
     def _(self, title: str, parent=None, is_v: bool = True):
         """
@@ -734,19 +741,78 @@ class CardGroup(QWidget):
         添加卡片
         :param card: 卡片组件
         :param wid: 卡片组件id（默认使用card）
-        :param pos: 卡片放置位置索引（正数0开始，倒数-1开始）
+        :param pos: 卡片放置位置索引（0 表示插在最前，-1 表示追加到末尾）
         """
         if not wid:
             wid = hex(id(card))
         if wid in self._cardMap:
             raise KeyError
-        if pos >= 0:
-            pos += 1
+        if pos >= 0 and self.show_title:
+            # 有标题时索引 0/1 被标题与间距占用，调用方给的位置相对第一张卡
+            pos += 2
         self.boxLayout.insertWidget(pos, card, 0, Qt.AlignmentFlag.AlignTop)
         self._cards.append(card)
         self._cardMap[wid] = card
         self.cardCountChanged.emit(self.count())
         return wid
+
+    # ------------------------------------------------------------------
+    # 滚动内容尺寸同步
+    # ------------------------------------------------------------------
+
+    def event(self, e):
+        """布局失效时安排一次滚动内容尺寸同步。
+
+        卡片因文字换行 / 增删而高度变化时，承载滚动区的 ``widgetResizable``
+        只在自身 resize / setWidget 等少数时机重算内容尺寸，会错过内容 sizeHint
+        的变化，导致垂直滚动范围停留在旧值（底部卡片滚不到 / 列表底部留白）。
+        """
+        if e.type() == QEvent.Type.LayoutRequest:
+            self._scrollSyncTimer.start()
+        return super().event(e)
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self._scrollSyncTimer.start()
+
+    def _owningScrollArea(self):
+        """向上查找承载本组件的 QScrollArea（直接放在页面里时返回 None）。"""
+        parent = self.parentWidget()
+        while parent is not None and not isinstance(parent, QScrollArea):
+            parent = parent.parentWidget()
+        return parent
+
+    def _syncScrollContentSize(self):
+        """把所在滚动区的内容 widget 尺寸同步为 max(视口, 内容实际高度)。
+
+        - 宽度取 max(视口宽, 内容最小宽)。**不用 sizeHint 的宽度**：开启换行的
+          标签其 sizeHint 宽度与视口无关（按自适应比例给出），用它会把内容撑到
+          比视口宽，重新引入横向滚动；
+        - 高度优先走 ``hasHeightForWidth`` 链（换行内容在当前宽度下的真实高度；
+          Qt 会沿 QWidget 容器与布局透传该标记），再与视口高取大。
+        """
+        scroll = self._owningScrollArea()
+        if scroll is None or not scroll.widgetResizable():
+            return
+        content = scroll.widget()
+        if content is None:
+            return
+        viewport = scroll.viewport()
+        minimum = content.minimumSizeHint()
+        width = max(viewport.width(), minimum.width())
+        layout = content.layout()
+        if layout is not None and layout.hasHeightForWidth():
+            height = layout.totalHeightForWidth(width)
+        else:
+            height = max(content.sizeHint().height(), minimum.height())
+        height = max(height, viewport.height())
+        if content.size() == QSize(width, height):
+            return
+        content.resize(width, height)
+        try:
+            scroll.updateScrollBars()
+        except Exception:
+            pass
 
     def addWidget(self, card, wid: str | int = None, pos: int = -1):
         """

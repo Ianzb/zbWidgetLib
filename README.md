@@ -68,3 +68,4 @@ zb组件库（zbWidgetLib）是一个PyQt5/PyQt6/PySide2/PySide6组件库，提�
 2026-05-31：3.6.2b1：迁移至uv。  
 2026-07-24：3.6.2：修复PageSpliter输入框事件触发异常的问题。  
 2026-07-24：3.6.3：新增StrictIntValidator，杜绝QIntValidator允许输入超限数值的问题。修复PageSpliter中editingFinished信号双次触发的Bug，完善输入校验与异常回退逻辑，修复ComboBox中截取多位数字时的解析错误。  
+2026-09-15：3.6.4：修复CardGroup高度计算异常的问题。  

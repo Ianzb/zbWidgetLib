@@ -198,7 +198,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/91/3f/d23d248029a49042d
 
 [[package]]
 name = "zbtoollib"
-version = "2.0.8.1"
+version = "2.0.9.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "puremagic" },
@@ -207,14 +207,14 @@ dependencies = [
     { name = "send2trash" },
     { name = "winshell", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1a/4d/b10f96578cf3a4102d5225f5739aaa83ef839814dd6b17d775d84f3b1038/zbtoollib-2.0.8.1.tar.gz", hash = "sha256:56bccf3ec3cf75c116ec2c949c9bd688287c88bbd570d5f3ae21207ce66913af", size = 12178, upload-time = "2026-02-28T12:21:10.12Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f2/db/cb6f2b704b82ef295963eeff503ebd878be1eb1a4fabb92abf5a339cd9dd/zbtoollib-2.0.9.1.tar.gz", hash = "sha256:d8e9922d83f7606f10ffd2627cff37fdb8753c160d9731f5c01983f7f17bf910", size = 12417, upload-time = "2026-08-04T09:54:51.903Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/56/45/a2cc18c376982f0b762487083092ba786161dfb0a8440c5b468cce61a5cd/zbtoollib-2.0.8.1-py3-none-any.whl", hash = "sha256:94d5e7b2909fc2463563fc4d89b149629f03a240680a0f653a77334c4d631ac3", size = 12717, upload-time = "2026-02-28T12:21:08.943Z" },
+    { url = "https://files.pythonhosted.org/packages/8f/a4/e5c2be2198f5617b70c19451df42511913f47e67a33897cf3148d22c7bea/zbtoollib-2.0.9.1-py3-none-any.whl", hash = "sha256:2c2aaa756cb645d8783163c4d673cd78ed3ad06a87012ad0434fde35b9c6b533", size = 12862, upload-time = "2026-08-04T09:54:50.805Z" },
 ]
 
 [[package]]
 name = "zbwidgetlib"
-version = "3.6.2"
+version = "3.6.4"
 source = { editable = "." }
 dependencies = [
     { name = "aenum" },
@@ -231,7 +231,7 @@ dev = [
 requires-dist = [
     { name = "aenum", specifier = ">=3.1.17" },
     { name = "qtpy", specifier = ">=2.4.3" },
-    { name = "zbtoollib", specifier = ">=2.0.8.1" },
+    { name = "zbtoollib", specifier = "==2.0.9.1" },
 ]
 
 [package.metadata.requires-dev]
