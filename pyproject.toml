@@ -3,11 +3,7 @@ name = "zbWidgetLib"
 version = "3.6.4"
 description = "zb组件库"
 requires-python = ">=3.12"
-dependencies = [
- "zbtoollib==2.0.9.1",
- "QtPy>=2.4.3",
- "aenum>=3.1.17",
-]
+dependencies = [ "zbtoollib==2.0.9.1", "QtPy>=2.4.3", "aenum>=3.1.17",]
 readme = "README.md"
 keywords = [ "zb", "Ianzb", "widget", "lib",]
 classifiers = [ "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.13", "Operating System :: OS Independent", "Operating System :: Microsoft :: Windows", "Operating System :: MacOS :: MacOS X", "Operating System :: POSIX :: Linux",]
